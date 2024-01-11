@@ -1,0 +1,639 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:mohawrapper="http://java.sun.com/jsf/composite/jsf2leaf"
+	template="/template2/index.xhtml"
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	xmlns:hf="http://highfaces.org">
+
+	<ui:define name="pageTitle">Add Fraude</ui:define>
+
+	<ui:define name="pagecontent">
+
+		<h:form id="form1">
+			<!-- rendered="#{tabMenuNavigationBean.pan_fraude}"> -->
+			<p:dataTable styleClass="myTable"
+				value="#{alerte_fraude.liste_regles}" paginator="true" rows="6"
+				var="regle" id="tblregle" rowKey="#{regle.id}"
+				selectionMode="single" selection="#{alerte_fraude.selected_regle}">
+				<p:ajax event="rowSelect" update=":form1:tblalerte,:form1:panelmap"
+					listener="#{alerte_fraude.selectRegle}" />
+				<p:column filterBy="#{regle.nom}" headerText="Regle Name">
+					<h:outputText value="#{regle.nom}" />
+				</p:column>
+				<p:column headerText="Flow" filterBy="#{regle.flux.flowName}"
+					filterOptions="#{alerte_fraude.fluxFilterOptions}">
+					<h:outputText value="#{regle.flux.flowName}" />
+				</p:column>
+			</p:dataTable>
+			<p:separator />
+
+			<p:panel header="Per Date">
+				<p:selectOneRadio value="#{alerte_fraude.typeDate}">
+					<p:ajax event="change" process="@form"
+						listener="#{alerte_fraude.affi	chParDate}" update="@form" />
+					<f:selectItem itemLabel="Per Decision Date" itemValue="ParDate" />
+					<f:selectItem itemLabel="All" itemValue="All" />
+				</p:selectOneRadio>
+			</p:panel>
+
+			<p:panel header="Periode" id="panPeriode"
+				rendered="#{alerte_fraude.parDate}">
+				<h:panelGrid columns="2">
+					<h:outputLabel value="Start Date" />
+					<p:calendar value="#{alerte_fraude.dateDebut}">
+
+					</p:calendar>
+					<h:outputLabel value="End Date" />
+					<p:calendar value="#{alerte_fraude.dateFin}">
+
+					</p:calendar>
+
+				</h:panelGrid>
+				<p:commandButton value="Refresh" ajax="true" process="@form"
+					onstart="PF('blockUIWidget').block()" styleClass="btn btn-primary"
+					oncomplete="PF('blockUIWidget').unblock()"
+					action="#{alerte_fraude.getDecisionsParDate}"
+					update=":form1:tblalerte"></p:commandButton>
+			</p:panel>
+
+
+
+
+			<p:dataTable styleClass="myTable"
+				value="#{alerte_fraude.listeAlerte}" widgetVar="tbCal"
+				paginator="true" rows="6" var="alerte" id="tblalerte"
+				rowKey="#{alerte[1]}" selection="#{alerte_fraude.selected_alerte}"
+				selectionMode="single"
+				paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown} {Exporters}"
+				rowsPerPageTemplate="6,12,16">
+				<p:ajax event="rowDblselect" onstart="PF('blockUIWidget').block()"
+					oncomplete="PF('blockUIWidget').unblock();PF('dlg3').show()"
+					listener="#{alerte_fraude.loadIdentitéCdr()}"
+					update=":form1:tabdetails :form1:tblparam form1" />
+
+				<f:facet name="{Exporters}">
+					<h:commandLink action="#{alerte_fraude.genaratexcel(alerte_fraude.listeAlerte)}">
+						<p:graphicImage library="img" name="excel.png" width="24" />
+					</h:commandLink>
+
+					<h:commandLink>
+						<p:graphicImage library="img" name="pdf.png" width="24" />
+						<pe:exporter type="pdf" target="tblalerte" fileName="RPFraude" />
+					</h:commandLink>
+
+				</f:facet>
+				<p:column>
+					<f:facet name="header">
+						<h:outputText value="Rule" />
+					</f:facet>
+					<h:outputText value="#{alerte_fraude.selected_regle.nom}" />
+				</p:column>
+				<p:column sortBy="#{alerte[1]}" filterBy="#{alerte[1]}">
+					<f:facet name="header">
+						<h:outputText value="MSISDN" />
+					</f:facet>
+					<h:outputText value="#{alerte[1]}" />
+				</p:column>
+				<p:column>
+					<f:facet name="header">
+						<h:outputText value="Start Date" />
+					</f:facet>
+					<h:outputText value="#{alerte[2]}" />
+				</p:column>
+				<p:column>
+					<f:facet name="header">
+						<h:outputText value="End Date" />
+					</f:facet>
+					<h:outputText value="#{alerte[3]}" />
+				</p:column>
+				<p:column headerText="Detection Date"
+					filterFunction="#{alerte_fraude.filterByDate}"
+					filterBy="#{alerte[4]}">
+					<f:facet name="filter">
+						<p:calendar id="cal1" pattern="yyyy-MM-dd">
+							<p:ajax event="dateSelect" oncomplete="PF('tbCal').filter()"
+								update="tblalerte" />
+							<p:ajax event="change" execute="@this"
+								oncomplete="PF('tbCal').filter()" update="tblalerte" />
+						</p:calendar>
+					</f:facet>
+					<h:outputText value="#{alerte[4]}" />
+
+				</p:column>
+				<p:column sortBy="#{alerte[5]}">
+					<f:facet name="header">
+						<h:outputText value="Number of Occurrences" />
+					</f:facet>
+					<h:outputText value="#{alerte[5]}" />
+				</p:column>
+
+				<f:facet name="footer">
+
+					<p:commandButton id="btndet" process="tblalerte"
+						icon="ui-icon-plusthick" value="Details" styleClass="btn btn-info"
+						onstart="PF('blockUIWidget').block()"
+						oncomplete="PF('blockUIWidget').unblock();PF('dlg3').show()"
+						action="#{alerte_fraude.loadIdentitéCdr()}"
+						update=":form1:tabdetails" />
+
+				</f:facet>
+			</p:dataTable>
+			<p:blockUI block=":form1:tblalerte" trigger="tblalerte:btndet">
+       Patientez<br />
+				<h:graphicImage value="/resources/img/ajaxloadingbar.gif" />
+			</p:blockUI>
+
+			<p:dialog header="Decision" widgetVar="dlg3" showEffect="explode"
+				hideEffect="bounce">
+				<p:tabView id="tabdetails" prependId="false" dynamic="true"
+					cache="false" onTabShow="$(window).trigger('resize')">
+					<p:tab title="Identité">
+									
+   
+     
+    
+						 <p:outputLabel for="popup" value="choisir Date :" />
+                        <p:calendar id="popup" value="#{alerte_fraude.date}" >
+                        	
+                         </p:calendar> 
+        
+                        <p:commandButton id="btnMo" 
+						icon="ui-icon-plusthick" value="Mo" styleClass="btn btn-info"
+						onstart="PF('blockUIWidget').block()"
+						oncomplete="PF('blockUIWidget').unblock();PF('dlgMo').show()"
+						action="#{alerte_fraude.affichageCdrMo()}"
+						update=":form1:tblMo" />
+					
+ 
+
+					<p:commandButton id="btnMt" 
+						icon="ui-icon-plusthick" value="Mt" styleClass="btn btn-info"
+						onstart="PF('blockUIWidget').block()"
+						oncomplete="PF('blockUIWidget').unblock();PF('dlgMt').show()"
+						action="#{alerte_fraude.affichageCdrMt()}"
+						update=":form1:tabdetails" />
+		
+						<p:panelGrid columns="2" id="tblparam">
+							<p:dataTable styleClass="myTable"  id="tblprm"
+								value="#{alerte_fraude.regles}" paginator="true" var ="regle"
+								rows="6"
+								rowKey="#{regle[1]}" selection="#{alerte_fraude.selected_parametre}"
+				                selectionMode="single"
+						        paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown} {Exporters}"
+								rowsPerPageTemplate="6,12,16">
+								<f:facet name="{Exporters}">
+									<h:commandLink>
+										<p:graphicImage library="img" name="excel.png" width="24" />
+										<pe:exporter type="xlsx" target="tblprm" fileName="RPFraude" />
+									</h:commandLink>
+
+									<h:commandLink>
+										<p:graphicImage library="img" name="pdf.png" width="24" />
+										<pe:exporter type="pdf" target="tblprm" fileName="RPFraude" />
+									</h:commandLink>
+
+								</f:facet>
+								<f:facet name="header">
+									<p:outputLabel value="Setting"></p:outputLabel>
+								</f:facet>
+								<p:column>
+									<f:facet name="header">
+										<h:outputText value="Setting" />
+									</f:facet>
+									<h:outputText value="#{regle[0]}" />
+								</p:column>
+								<p:column>
+									<f:facet name="header">
+										<h:outputText value="Value" />
+									</f:facet>
+									<h:outputText value="#{regle[4]}" />
+								</p:column>
+								<p:column>
+									<f:facet name="header">
+										<h:outputText value="Start Date" />
+									</f:facet>
+									<h:outputText value="#{regle[2]}" />
+								</p:column>
+								<p:column>
+									<f:facet name="header">
+										<h:outputText value="End Date" />
+									</f:facet>
+									<h:outputText value="#{regle[3]}" />
+								</p:column>
+							</p:dataTable>
+
+							<p:panel id="pan">
+								<f:facet name="header">
+									<h:graphicImage value="/resources/img/user_icon.png" />
+									<h:outputLabel value="Identity" />
+								</f:facet>
+								<p:panelGrid columns="2">
+									<p:outputLabel value="Number : " />
+									<p:outputLabel value="#{alerte_fraude.identities[1]}" />
+									<p:outputLabel value="Name :" />
+									<p:outputLabel value="#{alerte_fraude.identities[2]}" />
+									<p:outputLabel value="Countries :" />
+									<p:outputLabel value="#{alerte_fraude.identities[4]}" />
+									<p:outputLabel value="Class" />
+									<p:outputLabel value="#{alerte_fraude.identities[3]}" />
+									<p:outputLabel value="Activation  Date:" />
+									<p:outputLabel value="#{alerte_fraude.identities[12]}" />
+									<p:outputLabel value="Deactivation Date :" />
+									<p:outputLabel value="#{alerte_fraude.identities[13]}" />
+
+								</p:panelGrid>
+								<p:commandButton id="btn" value="Show Map" 
+									styleClass="btn btn-info"
+									action="#{alerte_fraude.showMap}" update=":form1:panelmap"
+									oncomplete="PF('dlgmap').show()" />
+
+							</p:panel>
+						</p:panelGrid>
+
+						<p:panelGrid columns="2">
+							<p:commandButton value="Black Liste" update=":form1:tblalerte"
+								action="#{alerte_fraude.BlackList}" styleClass="btn btn-primary"
+								oncomplete="PF('dlg3').hide();" />
+							<p:commandButton value="White Liste" update=":form1:tblalerte"
+								actionListener="#{alerte_fraude.WhiteList()}" styleClass="btn btn-primary"
+								oncomplete="PF('dlg3').hide();" />
+							<p:commandButton process="@form"
+								value="Black Liste et désactivation" styleClass="btn btn-primary"
+								actionListener="#{alerte_fraude.Desactiver()}"
+								update=":form1:tblalerte" oncomplete="PF('dlg3').hide();" />
+							<p:commandButton value="Delete" update=":form1:tblalerte"
+								oncomplete="PF('dlg3').hide();" styleClass="btn btn-danger"
+								actionListener="#{alerte_fraude.Supprimer()}" />
+						</p:panelGrid>
+					</p:tab>
+					<p:tab title="CDR" rendered="#{alerte_fraude.afficheCDR}">
+						<p:dataTable styleClass="myTable" id="tblCDR" value="#{alerte_fraude.cdrs}" var="cdr"
+							paginator="true" rows="6"
+							paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown} {Exporters}"
+							rowsPerPageTemplate="6,12,16">
+							<f:facet name="{Exporters}">
+								<h:commandLink>
+									<p:graphicImage library="img" name="excel.png" width="24" />
+									<pe:exporter type="xlsx" target="tblCDR" fileName="RPFraude" />
+								</h:commandLink>
+
+								<h:commandLink>
+									<p:graphicImage library="img" name="pdf.png" width="24" />
+									<pe:exporter type="pdf" target="tblCDR" fileName="RPFraude" />
+								</h:commandLink>
+
+							</f:facet>
+							<p:column>
+								<f:facet name="header">
+									<h:outputText value="Call Type" />
+								</f:facet>
+								<h:outputText value="#{cdr[1]}" />
+							</p:column>
+							<p:column>
+								<f:facet name="header">
+									<h:outputText value="Caller" />
+								</f:facet>
+								<h:outputText value="#{cdr[2]}" />
+							</p:column>
+
+							<p:column>
+								<f:facet name="header">
+									<h:outputText value="Call" />
+								</f:facet>
+								<h:outputText value="#{cdr[3]}" />
+							</p:column>
+							<p:column>
+								<f:facet name="header">
+									<h:outputText value="IMSI" />
+								</f:facet>
+								<h:outputText value="#{cdr[4]}" />
+							</p:column>
+							<p:column>
+								<f:facet name="header">
+									<h:outputText value="IMEI" />
+								</f:facet>
+								<h:outputText value="#{cdr[5]}" />
+							</p:column>
+							<p:column>
+								<f:facet name="header">
+									<h:outputText value="Hour Of Call" />
+								</f:facet>
+								<h:outputText value="#{cdr[6]}" />
+							</p:column>
+							<p:column>
+								<f:facet name="header">
+									<h:outputText value="Location" />
+								</f:facet>
+								<h:outputText value="#{cdr[13]}" />
+							</p:column>
+							<p:column>
+								<f:facet name="header">
+									<h:outputText value="MSC" />
+								</f:facet>
+								<h:outputText value="#{cdr[17]}" />
+							</p:column>
+							<p:column>
+								<f:facet name="header">
+									<h:outputText value="Duration" />
+								</f:facet>
+								<h:outputText value="#{cdr[9]}" />
+							</p:column>
+
+						</p:dataTable>
+					</p:tab>
+					<!-- 					<p:tab title="Location"> -->
+					<!-- 						<p:dataTable id="tblLocation" -->
+					<!-- 							value="#{alerte_fraude.details_fraude_location}" var="cdr" -->
+					<!-- 							paginator="true" rows="6" -->
+					<!-- 							paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown} {Exporters}" -->
+					<!-- 							rowsPerPageTemplate="6,12,16"> -->
+					<!-- 							<f:facet name="header"> -->
+					<!-- 								<h:outputLabel value="Report Details Fraud" /> -->
+					<!-- 							</f:facet> -->
+					<!-- 							<f:facet name="{Exporters}"> -->
+					<!-- 								<h:commandLink> -->
+					<!-- 									<p:graphicImage library="img" name="excel.png" width="24" /> -->
+					<!-- 									<pe:exporter type="xlsx" target="tblLocation" -->
+					<!-- 										fileName="RPFraude" /> -->
+					<!-- 								</h:commandLink> -->
+
+					<!-- 								<h:commandLink> -->
+					<!-- 									<p:graphicImage library="img" name="pdf.png" width="24" /> -->
+					<!-- 									<pe:exporter type="pdf" target="tblLocation" -->
+					<!-- 										fileName="RPFraude" /> -->
+					<!-- 								</h:commandLink> -->
+
+					<!-- 							</f:facet> -->
+
+					<!-- 							<p:column> -->
+					<!-- 								<f:facet name="header"> -->
+					<!-- 									<h:outputText value="MSISDN" /> -->
+					<!-- 								</f:facet> -->
+					<!-- 								<h:outputText value="#{cdr[0]}" /> -->
+					<!-- 							</p:column> -->
+					<!-- 							<p:column> -->
+					<!-- 								<f:facet name="header"> -->
+					<!-- 									<h:outputText value="Location" /> -->
+					<!-- 								</f:facet> -->
+					<!-- 								<h:outputText value="#{cdr[1]}" /> -->
+					<!-- 							</p:column> -->
+
+					<!-- 						</p:dataTable> -->
+
+					<!-- 					</p:tab> -->
+					<p:tab title="CDR IN Activation"
+						rendered="#{alerte_fraude.affichactivation}">
+						<p:dataTable styleClass="myTable" value="#{alerte_fraude.cdrs_in_activations}"
+							var="cdr" paginator="true" rows="6">
+							<f:facet name="header">
+								<h:outputLabel value=" List CDRs IN Activation" />
+							</f:facet>
+							<p:column>
+								<h:outputText value="#{cdr[1]}" />
+							</p:column>
+							<p:column>
+								<h:outputText value="#{cdr[2]}" />
+							</p:column>
+							<p:column>
+								<h:outputText value="#{cdr[3]}" />
+							</p:column>
+							<p:column>
+								<h:outputText value="#{cdr[4]}" />
+							</p:column>
+							<p:column>
+								<h:outputText value="#{cdr[5]}" />
+							</p:column>
+							<p:column>
+								<h:outputText value="#{cdr[6]}" />
+							</p:column>
+							<p:column>
+								<h:outputText value="#{cdr[7]}" />
+							</p:column>
+							<p:column>
+								<h:outputText value="#{cdr[8]}" />
+							</p:column>
+							<p:column>
+								<h:outputText value="#{cdr[9]}" />
+							</p:column>
+							<p:column>
+								<h:outputText value="#{cdr[10]}" />
+							</p:column>
+						</p:dataTable>
+					</p:tab>
+					<p:tab title="CDR IN Recharge"
+						rendered="#{alerte_fraude.affichrecharge}">
+						<p:dataTable styleClass="myTable" value="#{alerte_fraude.cdrs_in_recharge}" var="cdr"
+							paginator="true" rows="6">
+							<f:facet name="header">
+								<h:outputLabel value=" List CDRs IN Recharge" />
+							</f:facet>
+							<p:column>
+								<h:outputText value="#{cdr[1]}" />
+							</p:column>
+							<p:column>
+								<h:outputText value="#{cdr[2]}" />
+							</p:column>
+							<p:column>
+								<h:outputText value="#{cdr[3]}" />
+							</p:column>
+							<p:column>
+								<h:outputText value="#{cdr[4]}" />
+							</p:column>
+							<p:column>
+								<h:outputText value="#{cdr[5]}" />
+							</p:column>
+							<p:column>
+								<h:outputText value="#{cdr[6]}" />
+							</p:column>
+							<p:column>
+								<h:outputText value="#{cdr[7]}" />
+							</p:column>
+							<p:column>
+								<h:outputText value="#{cdr[8]}" />
+							</p:column>
+							<p:column>
+								<h:outputText value="#{cdr[9]}" />
+							</p:column>
+							<p:column>
+								<h:outputText value="#{cdr[10]}" />
+							</p:column>
+						</p:dataTable>
+					</p:tab>
+					<p:tab title="CDR IN Transfert"
+						rendered="#{alerte_fraude.affichtransfert}">
+						<p:dataTable styleClass="myTable" value="#{alerte_fraude.cdrs_in_transfert}" var="cdr"
+							paginator="true" rows="6">
+							<f:facet name="header">
+								<h:outputLabel value=" List CDRs IN Transfer" />
+							</f:facet>
+							<p:column>
+								<h:outputText value="#{cdr[1]}" />
+							</p:column>
+							<p:column>
+								<h:outputText value="#{cdr[2]}" />
+							</p:column>
+							<p:column>
+								<h:outputText value="#{cdr[3]}" />
+							</p:column>
+							<p:column>
+								<h:outputText value="#{cdr[4]}" />
+							</p:column>
+							<p:column>
+								<h:outputText value="#{cdr[5]}" />
+							</p:column>
+							<p:column>
+								<h:outputText value="#{cdr[6]}" />
+							</p:column>
+							<p:column>
+								<h:outputText value="#{cdr[7]}" />
+							</p:column>
+							<p:column>
+								<h:outputText value="#{cdr[8]}" />
+							</p:column>
+							<p:column>
+								<h:outputText value="#{cdr[9]}" />
+							</p:column>
+							<p:column>
+								<h:outputText value="#{cdr[10]}" />
+							</p:column>
+
+						</p:dataTable>
+					</p:tab>
+				</p:tabView>
+			</p:dialog>
+
+
+			<p:dialog id="gmapDialog" widgetVar="dlgmap" dynamic="true">
+				<p:outputPanel id="panelmap">
+					<mohawrapper:mapAdvanced map="#{alerte_fraude.springfieldMap}"
+						rendered="#{alerte_fraude.mapshowed}"></mohawrapper:mapAdvanced>
+
+				</p:outputPanel>
+				
+			</p:dialog>
+				<p:dialog id="dlgMo" widgetVar="dlgMo" dynamic="true">
+				<p:tabView id="tabMo" prependId="false" dynamic="true"
+					cache="false" onTabShow="$(window).trigger('resize')">
+			
+				</p:tabView>
+					<p:panelGrid columns="2" id="pnlMo">
+					<p:dataTable styleClass="myTable"  id="tblMo" widgetVar="tbMo"
+								value="#{alerte_fraude.mos}" paginator="true" var ="mo"
+								rows="6"
+						        paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown} {Exporters}"
+								rowsPerPageTemplate="6,12,16">
+								<f:facet name="{Exporters}">
+									<h:commandLink>
+										<p:graphicImage library="img" name="excel.png" width="24" />
+										<pe:exporter type="xlsx" target="tblprm" fileName="RPFraude" />
+									</h:commandLink>
+
+									<h:commandLink>
+										<p:graphicImage library="img" name="pdf.png" width="24" />
+										<pe:exporter type="pdf" target="tblprm" fileName="RPFraude" />
+									</h:commandLink>
+
+								</f:facet>
+								<f:facet name="header">
+									<p:outputLabel value="MO"></p:outputLabel>
+								</f:facet>
+								<p:column>
+									<f:facet name="header">
+										<h:outputText value="IMei" />
+									</f:facet>
+									<h:outputText value="#{mo[2]}" />
+								</p:column>
+								<p:column>
+									<f:facet name="header">
+										<h:outputText value="calling number" />
+									</f:facet>
+									<h:outputText value="#{mo[1]}" />
+								</p:column>
+								<p:column>
+									<f:facet name="header">
+										<h:outputText value="called number" />
+									</f:facet>
+									<h:outputText value="#{mo[0]}" />
+								</p:column>
+								<p:column>
+									<f:facet name="header">
+										<h:outputText value="call duration" />
+									</f:facet>
+									<h:outputText value="#{mo[3]}" />
+								</p:column>
+							</p:dataTable>
+							
+						</p:panelGrid>
+			</p:dialog>
+			<p:dialog id="dlgMt" widgetVar="dlgMt" dynamic="true">
+			
+				<p:tabView id="tabMt" prependId="false" dynamic="true"
+					cache="false" onTabShow="$(window).trigger('resize')">
+			
+				</p:tabView>
+					<p:panelGrid columns="2" id="pnlMt">
+					<p:dataTable styleClass="myTable"  id="tblMt"
+								value="#{alerte_fraude.mts}" paginator="true" var ="mt"
+								rows="6"
+						        paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown} {Exporters}"
+								rowsPerPageTemplate="6,12,16">
+								<f:facet name="{Exporters}">
+									<h:commandLink>
+										<p:graphicImage library="img" name="excel.png" width="24" />
+										<pe:exporter type="xlsx" target="tblprm" fileName="RPFraude" />
+									</h:commandLink>
+
+									<h:commandLink>
+										<p:graphicImage library="img" name="pdf.png" width="24" />
+										<pe:exporter type="pdf" target="tblprm" fileName="RPFraude" />
+									</h:commandLink>
+
+								</f:facet>
+								<f:facet name="header">
+									<p:outputLabel value="MT"></p:outputLabel>
+								</f:facet>
+								<p:column>
+									<f:facet name="header">
+										<h:outputText value="IMei" />
+									</f:facet>
+									<h:outputText value="#{mt[2]}" />
+								</p:column>
+								<p:column>
+									<f:facet name="header">
+										<h:outputText value="callaing number" />
+									</f:facet>
+									<h:outputText value="#{mt[1]}" />
+								</p:column>
+								<p:column>
+									<f:facet name="header">
+										<h:outputText value="called number" />
+									</f:facet>
+									<h:outputText value="#{mt[0]}" />
+								</p:column>
+								<p:column>
+									<f:facet name="header">
+										<h:outputText value="call duration" />
+									</f:facet>
+									<h:outputText value="#{mt[3]}" />
+								</p:column>
+							</p:dataTable>
+						</p:panelGrid>
+			</p:dialog>
+		
+		
+
+			<pe:blockUI widgetVar="blockUIWidget">
+				<h:panelGrid columns="2">
+					<h:graphicImage library="img" name="ajaxloadingbar.gif"
+						style="margin-right: 12px; vertical-align: middle;" />
+					<h:outputText value="Please wait..." style="white-space: nowrap;" />
+				</h:panelGrid>
+			</pe:blockUI>
+		</h:form>
+
+	</ui:define>
+</ui:composition>
+

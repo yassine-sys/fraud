@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="2.1"
+	xmlns="http://xmlns.jcp.org/xml/ns/persistence"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
+	<persistence-unit name="FraudConfiguration">
+		<jta-data-source>java:/administrationDS</jta-data-source>
+		<class>com.fraude.entities.AbstractEntity</class>
+		<class>com.fraude.entities.CategoriesFraude</class>
+		<class>com.fraude.entities.Cell</class>
+		<class>com.fraude.entities.Config_ASCII</class>
+		<class>com.fraude.entities.Config_ASN1</class>
+		<class>com.fraude.entities.Convertisseur</class>
+		<class>com.fraude.entities.DecisionFraude</class>
+		<class>com.fraude.entities.DestAccOffre</class>
+		<class>com.fraude.entities.Destination</class>
+		<class>com.fraude.entities.DetailsAccOffre</class>
+		<class>com.fraude.entities.DetailsDestination</class>
+		<class>com.fraude.entities.DetailsMail</class>
+		<class>com.fraude.entities.DetailsOffre</class>
+		<class>com.fraude.entities.DetailsSms</class>
+		<class>com.fraude.entities.EtlBinType</class>
+		<class>com.fraude.entities.EtlDataType</class>
+		<class>com.fraude.entities.EtlFieldFlow</class>
+		<class>com.fraude.entities.EtlFieldProc</class>
+		<class>com.fraude.entities.EtlFieldService</class>
+		<class>com.fraude.entities.EtlFunction</class>
+		<class>com.fraude.entities.EtlJob</class>
+		<class>com.fraude.entities.EtlJobFlow</class>
+		<class>com.fraude.entities.EtlPrincipalFields</class>
+		<class>com.fraude.entities.EtlProc</class>
+		<class>com.fraude.entities.EtlProcFlow</class>
+		<class>com.fraude.entities.EtlRepFunction</class>
+		<class>com.fraude.entities.EtlServiceConverter</class>
+		<class>com.fraude.entities.EtlServiceConverterTags</class>
+		<class>com.fraude.entities.EtlTypeFlow</class>
+		<class>com.fraude.entities.FiltresFraude</class>
+		<class>com.fraude.entities.FiltresReglesFraude</class>
+		<class>com.fraude.entities.Flow</class>
+		<class>com.fraude.entities.FluxCdr</class>
+		<class>com.fraude.entities.Function</class>
+		<class>com.fraude.entities.GuiGroup</class>
+		<class>com.fraude.entities.GuiModulesGroup</class>
+		<class>com.fraude.entities.GuiUser</class>
+		<class>com.fraude.entities.ListAppelant</class>
+		<class>com.fraude.entities.ListAppele</class>
+		<class>com.fraude.entities.ListCellid</class>
+		<class>com.fraude.entities.ListDetailsAppelant</class>
+		<class>com.fraude.entities.ListDetailsAppele</class>
+		<class>com.fraude.entities.ListDetailsCellid</class>
+		<class>com.fraude.entities.ListDetailsImei</class>
+		<class>com.fraude.entities.ListImei</class>
+		<class>com.fraude.entities.Noeud</class>
+		<class>com.fraude.entities.Offre</class>
+		<class>com.fraude.entities.OffrePlanTarif</class>
+		<class>com.fraude.entities.OperatorDeployment</class>
+		<class>com.fraude.entities.PackageZone</class>
+		<class>com.fraude.entities.ParametresFraude</class>
+		<class>com.fraude.entities.ParametresReglesFraude</class>
+		<class>com.fraude.entities.PlanTarifaire</class>
+		<class>com.fraude.entities.ReglesFraude</class>
+		<class>com.fraude.entities.RepModule</class>
+		<class>com.fraude.entities.RepSubModule</class>
+		<class>com.fraude.entities.Repertoire</class>
+		<class>com.fraude.entities.Report</class>
+		<class>com.fraude.entities.Serveur</class>
+		<class>com.fraude.entities.Service</class>
+		<class>com.fraude.entities.StatFraudeMsisdn</class>
+		<class>com.fraude.entities.SubGroupTabSelected</class>
+		<class>com.fraude.entities.SubModuleGroup</class>
+		<class>com.fraude.entities.System</class>
+		<class>com.fraude.entities.TblLog</class>
+		<class>com.fraude.entities.TypeDestination</class>
+		<class>com.fraude.entities.Zone</class>
+		<class>com.fraude.entities.ZonesDestination</class>
+		<class>com.fraude.entities.Non_Frodulent_seq</class>
+
+		<properties>
+			<property name="hibernate.hbm2ddl.auto" value="update" />
+			<property name="hibernate.show_sql" value="true" />
+			<property name="hibernate.format_sql" value="true" />
+		</properties>
+	</persistence-unit>
+</persistence>

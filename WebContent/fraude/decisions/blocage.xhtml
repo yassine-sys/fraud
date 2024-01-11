@@ -1,0 +1,98 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:mohawrapper="http://java.sun.com/jsf/composite/jsf2leaf"
+	template="/template2/index.xhtml"
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	xmlns:hf="http://highfaces.org">
+
+	<ui:define name="pageTitle">Add Fraud</ui:define>
+
+
+	<ui:define name="pagecontent">
+		<script>
+		$( "#fraud-decision-dd" ).addClass( "active" );
+		$( "#fraud-decision-dd #item1" ).addClass( "active" );
+		
+		</script>
+		<h:form id="form1">
+			<p:panel header="Blocage">
+				<h:outputLabel value="Type de lancement" />
+
+				<p:selectOneMenu value="#{fraude_block.type_lancement}">
+					<p:ajax event="change" listener="#{fraude_block.changeType()}"
+						update="@form"></p:ajax>
+					<f:selectItem itemLabel="Manual" itemValue="manuel" />
+					<f:selectItem itemLabel="Per File" itemValue="fichier" />
+				</p:selectOneMenu>
+			</p:panel>
+			<p:panel rendered="#{fraude_block.manuel}">
+
+				<p:panelGrid columns="4">
+					<h:outputLabel value="Number" />
+					<p:inputText value="#{fraude_block.numero}">
+						<f:convertNumber minIntegerDigits="8" />
+					</p:inputText>
+
+					<p:selectOneMenu value="#{fraude_block.choix}">
+						<f:selectItem itemLabel="Blocage" itemValue="blocage" />
+						<f:selectItem itemLabel="Unlock" itemValue="deblocage" />
+					</p:selectOneMenu>
+					<p:commandButton value="Execut" styleClass="btn btn-primary"
+						action="#{fraude_block.ValidateBlockOne()}" update="@form"></p:commandButton>
+
+				</p:panelGrid>
+
+			</p:panel>
+			<p:panel rendered="#{fraude_block.parFichier}">
+
+
+				<p:fileUpload id=" fileup"
+					fileUploadListener="#{fraude_block.NumeroFromFichier}"
+					mode="advanced" dragDropSupport="false" update="@form"
+					allowTypes="/(\.|\/)(xlsx|xls)$/" process="@form" />
+
+
+
+				<p:dataTable value="#{fraude_block.lstNum}" var="num" id="dtNum"
+					paginator="true" rows="400" rowKey="#{num.index}"
+					rendered="#{fraude_block.completed}">
+
+					<p:column>
+						<f:facet name="header">
+							<h:outputLabel value="Numero" />
+						</f:facet>
+						<h:outputText value="#{num.num}" />
+					</p:column>
+					<f:facet name="footer">
+						<h:panelGrid columns="2">
+							<p:commandButton value="Lock"
+								action="#{fraude_block.ValiderBlock()}" update="@form"
+								onstart="PF('blockUIWidget').block();"
+								oncomplete="PF('blockUIWidget').unblock()"></p:commandButton>
+							<p:commandButton value="Unlock"
+								action="#{fraude_block.DeBlockFile()}" update="@form"
+								onstart="PF('blockUIWidget').block();"
+								oncomplete="PF('blockUIWidget').unblock()"></p:commandButton>
+						</h:panelGrid>
+					</f:facet>
+				</p:dataTable>
+
+			</p:panel>
+
+			<pe:blockUI widgetVar="blockUIWidget">
+				<h:panelGrid columns="2">
+					<h:graphicImage library="img" name="ajaxloadingbar.gif"
+						style="margin-right: 12px; vertical-align: middle;" />
+					<h:outputText value="Please wait " id="outPut1"
+						style="white-space: nowrap;" />
+				</h:panelGrid>
+			</pe:blockUI>
+
+
+		</h:form>
+	</ui:define>
+</ui:composition>
+

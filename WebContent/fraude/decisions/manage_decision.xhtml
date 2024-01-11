@@ -1,0 +1,207 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui" template="/template2/index.xhtml"
+	xmlns:hf="http://highfaces.org"
+	xmlns:pe="http://primefaces.org/ui/extensions">
+
+	<ui:define name="pageTitle">Management Rule Of Fraud</ui:define>
+
+
+	<ui:define name="pagecontent">
+
+		<script>
+		$( "#fraud-decision-dd" ).addClass( "active" );
+		$( "#fraud-decision-dd #item0" ).addClass( "active" );
+		
+		</script>
+		<h:form id="form1">
+			<!-- rendered="#{tabMenuNavigationBean.pan_fraude}">-->
+			<p:panel header="Type">
+				<p:selectOneRadio id="console" value="#{manage_decision.choix}">
+					<p:ajax event="change" process="@form"
+						listener="#{manage_decision.affichBlack}" update="@form" />
+					<f:selectItem itemLabel="Black Liste" itemValue="B" />
+					<f:selectItem itemLabel="Black Liste et désactivation"
+						itemValue="D" />
+					<f:selectItem itemLabel="White Liste" itemValue="W" />
+					<f:selectItem itemLabel="Delete" itemValue="S" />
+				</p:selectOneRadio>
+			</p:panel>
+			<p:panel header="Per Date">
+				<p:selectOneRadio value="#{manage_decision.typeDate}">
+					<p:ajax event="change" process="@form"
+						listener="#{manage_decision.affichParDate}" update="@form" />
+					<f:selectItem itemLabel="Per Decision Date" itemValue="ParDate" />
+					<f:selectItem itemLabel="All" itemValue="All" />
+				</p:selectOneRadio>
+			</p:panel>
+			<p:panel header="Periode" id="panPeriode"
+				rendered="#{manage_decision.parDate}">
+				<h:panelGrid columns="2">
+					<h:outputLabel value="Start Date" />
+					<p:calendar value="#{manage_decision.dateDebut}">
+
+
+					</p:calendar>
+					<h:outputLabel value="End Date" />
+					<p:calendar value="#{manage_decision.dateFin}">
+
+					</p:calendar>
+
+				</h:panelGrid>
+				<p:commandButton value="Refresh" ajax="true" process="@form" styleClass="btn btn-primary"
+					onstart="PF('blockUIWidget').block()"
+					oncomplete="PF('blockUIWidget').unblock()"
+					action="#{manage_decision.getDecisionsParDate}" update=":form1:tbl"></p:commandButton>
+			</p:panel>
+
+
+			<p:dataTable styleClass="myTable" value="#{manage_decision.liste_decisions}"
+				var="decision" id="tbl" paginator="true" rows="7"
+				selection="#{manage_decision.decision}" selectionMode="single"
+				rowKey="#{decision.id}"
+				paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown} {Exporters}"
+				rowsPerPageTemplate="6,12,16">
+				<f:facet name="header">
+					<h:outputText value="Decisions Fraud" />
+				</f:facet>
+				<f:facet name="{Exporters}">
+					<h:commandLink action="#{manage_decision.genaratexcel(manage_decision.liste_decisions)}" >
+						<p:graphicImage library="img" name="excel.png" width="24" />
+					</h:commandLink>
+
+					<h:commandLink>
+						<p:graphicImage library="img" name="pdf.png" width="24" />
+						<pe:exporter type="pdf" target="tbl" fileName="DecisionsFraude" />
+					</h:commandLink>
+
+				</f:facet>
+
+
+				<p:ajax event="rowSelect" update="tbl" />
+				<p:ajax event="rowUnselect" update="tbl" />
+
+				<p:column filterBy="#{decision.msisdn}">
+					<f:facet name="header">
+						<h:outputText value="MSISDN" />
+					</f:facet>
+					<h:outputLabel value="#{decision.msisdn}" />
+				</p:column>
+				<p:column>
+					<f:facet name="header">
+						<h:outputText value="Decision" />
+					</f:facet>
+					<h:outputLabel value="Desactivation"
+						rendered="#{decision.decision eq 'D'}" />
+					<h:outputLabel value="BlackList"
+						rendered="#{decision.decision eq 'B'}" />
+					<h:outputLabel value="WhiteList"
+						rendered="#{decision.decision eq 'W'}" />
+					<h:outputLabel value="Delete"
+						rendered="#{decision.decision eq 'S'}" />
+				</p:column>
+				<p:column>
+					<f:facet name="header">
+						<h:outputText value="User" />
+					</f:facet>
+					<h:outputLabel value="#{decision.nomUtilisateur}" />
+				</p:column>
+				<p:column>
+					<f:facet name="header">
+						<h:outputText value="Decision Date" />
+					</f:facet>
+					<h:outputLabel value="#{decision.dateDecision}" />
+				</p:column>
+				<p:column>
+					<f:facet name="header">
+						<h:outputText value="Rule" />
+					</f:facet>
+					<h:outputLabel value="#{decision.regle.nom}" />
+				</p:column>
+				<p:column style="width:32px;text-align: center">
+					<p:commandButton process="tbl" update="tbl" icon="ui-icon-trash"
+						title="Delete">
+						<f:setPropertyActionListener value="#{decision}"
+							target="#{manage_decision.decision}" />
+					</p:commandButton>
+				</p:column>
+				<f:facet name="footer">
+					<p:commandButton
+						rendered="#{manage_decision.decision.decision eq 'B' or manage_decision.decision.decision eq 'D'}"
+						value="Info Fraud" action="#{manage_decision.getFraudeurInfo()}"  
+						style="color:#fff; background: rgb(28, 184, 65) ; border-color: #d73925 ;"
+						oncomplete="PF('dlgmodifdetap').show()" 
+						update=":form1:panmodifdetapelant"></p:commandButton>
+					<p:commandButton
+						rendered="#{manage_decision.decision.decision eq 'W' or manage_decision.decision.decision eq 'D' or manage_decision.decision.decision eq 'S'}"
+						value="BlackList" action="#{manage_decision.black}" update="tbl" styleClass="btn btn-primary"
+						process="tbl"></p:commandButton>
+					<p:commandButton
+						rendered="#{manage_decision.decision.decision eq 'S' or manage_decision.decision.decision eq 'D' or manage_decision.decision.decision eq 'B'}"
+						value="WhiteList" action="#{manage_decision.white}" update="tbl" styleClass="btn btn-primary"
+						process="tbl"></p:commandButton>
+					<p:commandButton
+						rendered="#{manage_decision.decision.decision eq 'W' or manage_decision.decision.decision eq 'B' or manage_decision.decision.decision eq 'S'}"
+						value="Desactivation" action="#{manage_decision.desactiver}" styleClass="btn btn-primary"
+						update="tbl" process="tbl"></p:commandButton>
+					<p:commandButton
+						rendered="#{manage_decision.decision.decision eq 'W' or manage_decision.decision.decision eq 'B' or manage_decision.decision.decision eq 'D'}"
+						value="Delete" action="#{manage_decision.supprimer}" update="tbl" styleClass="btn btn-danger"
+						process="tbl"></p:commandButton>
+							
+				</f:facet>
+			</p:dataTable>
+											
+			<p:dialog width="600" header="Details Fraudster"
+				widgetVar="dlgmodifdetap" showEffect="explode" hideEffect="bounce"
+				dynamic="true">
+				<p:outputPanel id="panmodifdetapelant">
+					<f:facet name="header">
+						<h:graphicImage value="/resources/img/user_icon.png" />
+						<h:outputLabel value="Identité" />
+					</f:facet>
+					<p:panelGrid columns="2">
+						<p:outputLabel value="Number : " />
+						<p:outputLabel value="#{manage_decision.fraudeur.msisdn}" />
+						<p:outputLabel value="Fraud Category:" />
+						<p:outputLabel
+							value="#{manage_decision.fraudeur.category.nomCategorie}" />
+						<p:outputLabel value="Number Of Call" />
+						<p:outputLabel value="#{manage_decision.fraudeur.nbAppel}" />
+						<p:outputLabel value="Duration" />
+						<p:outputLabel value="#{manage_decision.fraudeur.duree}" />
+						<p:outputLabel value="Max Date :" />
+						<p:outputLabel value="#{manage_decision.fraudeur.maxDate}" />
+						<p:outputLabel value="Min Date : " />
+						<p:outputLabel value="#{manage_decision.fraudeur.minDate}" />
+
+
+					</p:panelGrid>
+					<p:dataTable styleClass="myTable"  value="#{manage_decision.detailsfraudeur}" rows="5"
+						paginator="true" var="frad">
+						<p:column headerText="Location">
+							<h:outputText value="#{frad[0]}" />
+						</p:column>
+						<p:column headerText="Duration">
+							<h:outputText value="#{frad[1]}" />
+						</p:column>
+						<p:column headerText="Number Of Call">
+							<h:outputText value="#{frad[2]}" />
+						</p:column>
+
+					</p:dataTable>
+				</p:outputPanel>
+			</p:dialog>
+			<pe:blockUI widgetVar="blockUIWidget">
+				<h:panelGrid columns="2">
+					<h:graphicImage library="img" name="ajaxloadingbar.gif"
+						style="margin-right: 12px; vertical-align: middle;" />
+					<h:outputText value="Please wait..." style="white-space: nowrap;" />
+				</h:panelGrid>
+			</pe:blockUI>
+		</h:form>
+
+	</ui:define>
+</ui:composition>

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title></title>
+	    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+
+<body>
+    
+    
+        
+
+    
+</body>
+
+</html>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js" type="text/javascript"></script>
+<script type="text/javascript">
+    $(document).ready(function() {
+        $(".facebookbox").hover(function() {
+            $(this).stop().animate({
+                right: "0"
+            }, "medium");
+        }, function() {
+            $(this).stop().animate({
+                right: "-250"
+            }, "medium");
+        }, 500);
+    });
+</script>
+<style type="text/css">
+    .facebookbox {
+        background: url("https://image.ibb.co/dE11jz/settings_1.png") no-repeat scroll left center transparent!important;
+        display: block;
+        float: right;
+        height: 270px;
+        padding: 0 5px 0 70px;
+        width: 245px;
+        z-index: 99999;
+        position: fixed;
+        right: -250px;
+        top: 40%;
+		cursor: pointer;
+    }
+    
+    .facebookbox div {
+        border: none;
+        position: relative;
+        display: block;
+    }
+    
+   
+    
+    .facebookbox span a:hover {
+        text-decoration: underline;
+    }
+</style>
+</head>
+
+<body bgcolor="#EEEEEE">
+    <div class="facebookbox">
+	<span>Filter Type :</span>
+		   <select name="filtertype">
+		   <option value="null">Select Filter Type</option>
+		   <option value="type1">Type1</option>
+		   <option value="type2">Type2</option>
+		   <option value="type3">Type3</option>
+		   </select>
+	<span>Begin Date :</span><br/>
+	       <input type="date" name="begindate"><br/>
+		   
+    <span>End Date :</span> <br/>  
+		   <input type="date" name="enddate"><br/>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+    </div>
+    </html>

@@ -1,0 +1,842 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui" template="/template2/index.xhtml"
+	xmlns:hf="http://highfaces.org" xmlns:pe="http://primefaces.org/ui">
+	<ui:define name="pageTitle">welcome</ui:define>
+
+
+	<ui:define name="pagecontent">
+
+		<script>
+		$( "#fraud-conf-dd" ).addClass( "active" );
+		$( "#fraud-conf-dd #item2" ).addClass( "active" );
+		
+		</script>
+		<h:form id="form1">
+
+			<p:tabView id="tabview" dynamic="true">
+
+				<p:tab title="List Appelant">
+					<p:dataTable styleClass="myTable" var="dest" id="singleDT1"
+						paginator="true" paginatorPosition="top" rows="15"
+						scrollable="true" scrollHeight="280"
+						value="#{manage_hotlist.liste_appelant}" rowKey="#{dest.id}"
+						selectionMode="single" selection="#{manage_hotlist.appelant1}">
+						<p:ajax event="rowDblselect" update=":form1:CodeDetailsAppelant"
+							listener="#{manage_hotlist.loadDetailsAppelant()}"
+							oncomplete="PF('dlgDetailsApp').show()" />
+						<f:facet name="header">
+							<p:outputLabel value="Gestion Appelant" />
+						</f:facet>
+						<p:column style="width:200px" headerText="Nom">
+							<h:outputText value="#{dest.nom}" />
+						</p:column>
+
+						<p:column style="width:200px" headerText="Utilisateur">
+							<h:outputText value="#{dest.nomUitlisateur}" />
+						</p:column>
+						<p:column style="width:200px" headerText="Date Insertion">
+							<h:outputText value="#{dest.dateModif}" />
+						</p:column>
+						<p:column style="width:100px;text-align: center">
+							<p:commandButton process=":form1:tabview:singleDT1"
+								style="color:#fff; background: rgb(28, 184, 65) ; border-color: #d73925 ;"
+								icon="ui-icon-arrowrefresh-1-w" title="Modifier" value="update"
+								oncomplete="PF('dlgmodifappelant').show();">
+								<f:setPropertyActionListener value="#{dest}"
+									target="#{manage_hotlist.appelant1}" />
+							</p:commandButton>
+						</p:column>
+						<p:column style="width:100px;text-align: center">
+							<p:commandButton process=":form1:tabview:singleDT1"
+								styleClass="btn btn-danger" update=":form1:tabview:singleDT1"
+								icon="ui-icon-trash" style="height:30px;" value="delete"
+								title="Supprimer" action="#{manage_hotlist.deleteAppelant()}">
+								<f:setPropertyActionListener value="#{dest}"
+									target="#{manage_hotlist.appelant1}" />
+								<p:confirm header="Confirmation" message="Etes vous Sure?"
+									icon="ui-icon-alert" />
+							</p:commandButton>
+
+							<p:confirmDialog global="true" showEffect="fade"
+								hideEffect="fade">
+								<p:commandButton value="Oui" type="button"
+									styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+								<p:commandButton value="Non" type="button"
+									styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+							</p:confirmDialog>
+						</p:column>
+
+						<f:facet name="footer">
+							<h:panelGrid columns="2">
+
+								<p:commandButton process=":form1:tabview:singleDT1"
+									style=" width:100%" icon="ui-icon-plusthick" value="Ajouter"
+									styleClass="btn btn-primary"
+									oncomplete="PF('dlg_ajout_appelant').show()" />
+								<p:commandButton process=":form1:tabview:singleDT1"
+									update=":form1:CodeDetailsAppelant" style="width:100%"
+									styleClass="btn btn-info"
+									action="#{manage_hotlist.loadDetailsAppelant()}"
+									icon="ui-icon-search" value="Details"
+									oncomplete="PF('dlgDetailsApp').show()" />
+
+							</h:panelGrid>
+						</f:facet>
+
+					</p:dataTable>
+				</p:tab>
+
+				<p:tab title="List CellID">
+					<p:dataTable styleClass="myTable" var="dest" id="singleDT3"
+						paginator="true" rows="15" value="#{manage_hotlist.liste_cellid}"
+						rowKey="#{dest.id}" selectionMode="single"
+						selection="#{manage_hotlist.cellid1}">
+						<p:ajax event="rowDblselect" update=":form1:CodeDetailsCellId"
+							listener="#{manage_hotlist.loadDetailsCell()}"
+							oncomplete="PF('dlgDetailsCellId').show()" />
+
+						<f:facet name="header">
+							<p:outputLabel value="Gestion CellID"></p:outputLabel>
+						</f:facet>
+						<p:column headerText="Nom">
+							<h:outputText value="#{dest.nom}" />
+						</p:column>
+
+
+						<p:column headerText="Utilisateur">
+							<h:outputText value="#{dest.nomUtilisateur}" />
+						</p:column>
+						<p:column headerText="Date Insertion">
+							<h:outputText value="#{dest.dateModif}" />
+						</p:column>
+						<p:column style="width:100px;text-align: center">
+							<p:commandButton process=":form1:tabview:singleDT3"
+								icon="ui-icon-arrowrefresh-1-w" title="Modifier" value="update"
+								style="color:#fff; background: rgb(28, 184, 65) ; border-color: #d73925 ;"
+								oncomplete="PF('dlgmodifimei').show();">
+								<f:setPropertyActionListener value="#{dest}"
+									target="#{manage_hotlist.cellid1}" />
+							</p:commandButton>
+						</p:column>
+						<p:column style="width:100px;text-align: center">
+							<p:commandButton process=":form1:tabview:singleDT3"
+								styleClass="btn btn-danger" value="delete"
+								update=":form1:tabview:singleDT3" icon="ui-icon-trash"
+								title="Supprimer" action="#{manage_hotlist.deleteCellId()}">
+								<f:setPropertyActionListener value="#{dest}"
+									target="#{manage_hotlist.cellid1}" />
+								<p:confirm header="Confirmation" message="Etes vous Sure?"
+									icon="ui-icon-alert" />
+							</p:commandButton>
+
+							<p:confirmDialog global="true" showEffect="fade"
+								hideEffect="fade">
+								<p:commandButton value="Oui" type="button"
+									styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+								<p:commandButton value="Non" type="button"
+									styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+							</p:confirmDialog>
+						</p:column>
+
+						<f:facet name="footer">
+							<h:panelGrid columns="2">
+
+								<p:commandButton process=":form1:tabview:singleDT3"
+									styleClass="btn btn-primary" icon="ui-icon-plusthick"
+									value="Ajouter" style="width:100%"
+									oncomplete="PF('dlg_ajout_cellid').show()" />
+								<p:commandButton process=":form1:tabview:singleDT3"
+									update=":form1:CodeDetailsCellId" styleClass="btn btn-info"
+									style="width:100%" action="#{manage_hotlist.loadDetailsCell()}"
+									icon="ui-icon-plusthick" value="Details"
+									oncomplete="PF('dlgDetailsCellId').show()" />
+
+							</h:panelGrid>
+						</f:facet>
+
+					</p:dataTable>
+				</p:tab>
+
+				<p:tab title="List Appele">
+					<p:dataTable styleClass="myTable" var="dest" id="singleDT"
+						paginator="true" rows="15" value="#{manage_hotlist.liste_appele}"
+						rowKey="#{dest.id}" selectionMode="single"
+						selection="#{manage_hotlist.appele1}">
+						<p:ajax event="rowDblselect" update=":form1:CodeDetails"
+							listener="#{manage_hotlist.loadDetails}"
+							oncomplete="PF('dlg5').show()" />
+						<f:facet name="header">
+							<p:outputLabel value="Gestion Appele"></p:outputLabel>
+						</f:facet>
+						<p:column headerText="Nom">
+							<h:outputText value="#{dest.nom}" />
+						</p:column>
+
+
+						<p:column headerText="Utilisateur">
+							<h:outputText value="#{dest.nomUtilisateur}" />
+						</p:column>
+						<p:column headerText="Date Insertion">
+							<h:outputText value="#{dest.dateModif}" />
+						</p:column>
+						<p:column style="width:100px;text-align: center">
+							<p:commandButton process=":form1:tabview:singleDT"
+								style="color:#fff; background: rgb(28, 184, 65) ; border-color: #d73925 ;"
+								value="update" icon="ui-icon-arrowrefresh-1-w" title="Modifier"
+								oncomplete="PF('dlg4').show();">
+								<f:setPropertyActionListener value="#{dest}"
+									target="#{manage_hotlist.appele1}" />
+							</p:commandButton>
+						</p:column>
+						<p:column style="width:100px;text-align: center">
+							<p:commandButton process=":form1:tabview:singleDT"
+								styleClass="btn btn-danger" value="delete"
+								update=":form1:tabview:singleDT" icon="ui-icon-trash"
+								title="Supprimer" action="#{manage_hotlist.deletAppele()}">
+								<f:setPropertyActionListener value="#{dest}"
+									target="#{manage_hotlist.appele1}" />
+								<p:confirm header="Confirmation" message="Etes vous Sure?"
+									icon="ui-icon-alert" />
+							</p:commandButton>
+
+							<p:confirmDialog global="true" showEffect="fade"
+								hideEffect="fade">
+								<p:commandButton value="Oui" type="button"
+									styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+								<p:commandButton value="Non" type="button"
+									styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+							</p:confirmDialog>
+						</p:column>
+
+						<f:facet name="footer">
+							<h:panelGrid columns="2">
+
+								<p:commandButton process=":form1:tabview:singleDT"
+									styleClass="btn btn-primary" icon="ui-icon-plusthick"
+									value="Ajouter" style="width:100%"
+									oncomplete="PF('dlg_ajout_appele').show()" />
+								<p:commandButton process=":form1:tabview:singleDT"
+									update=":form1:CodeDetails" styleClass="btn btn-info"
+									style="width:100%" action="#{manage_hotlist.loadDetails()}"
+									icon="ui-icon-plusthick" value="Details"
+									oncomplete="PF('dlg5').show()" />
+
+							</h:panelGrid>
+						</f:facet>
+
+					</p:dataTable>
+
+				</p:tab>
+
+				<p:tab title="List IMEI">
+					<p:dataTable styleClass="myTable" var="dest" id="singleDT2"
+						paginator="true" rows="15" value="#{manage_hotlist.liste_imei}"
+						rowKey="#{dest.id}" selectionMode="single"
+						selection="#{manage_hotlist.imei1}">
+						<p:ajax event="rowDblselect" update=":form1:CodeDetailsImei"
+							listener="#{manage_hotlist.loadDetailsImei}"
+							oncomplete="PF('dlgDetailsImei').show()" />
+						<f:facet name="header">
+							<p:outputLabel value="Gestion IMEI"></p:outputLabel>
+						</f:facet>
+						<p:column headerText="Nom">
+							<h:outputText value="#{dest.nom}" />
+						</p:column>
+
+
+						<p:column headerText="Utilisateur">
+							<h:outputText value="#{dest.nomUtilisateur}" />
+						</p:column>
+						<p:column headerText="Date Insertion">
+							<h:outputText value="#{dest.dateModif}" />
+						</p:column>
+						<p:column style="width:100px;text-align: center">
+							<p:commandButton process=":form1:tabview:singleDT2"
+								value="update"
+								style="color:#fff; background: rgb(28, 184, 65) ; border-color: #d73925 ;"
+								icon="ui-icon-arrowrefresh-1-w" title="Modifier"
+								oncomplete="PF('dlgmodifimei').show();">
+								<f:setPropertyActionListener value="#{dest}"
+									target="#{manage_hotlist.imei1}" />
+							</p:commandButton>
+						</p:column>
+						<p:column style="width:100px;text-align: center">
+							<p:commandButton process=":form1:tabview:singleDT2"
+								value="delete" styleClass="btn btn-danger"
+								update=":form1:tabview:singleDT2" icon="ui-icon-trash"
+								title="Supprimer" action="#{manage_hotlist.deleteImei()}">
+								<f:setPropertyActionListener value="#{dest}"
+									target="#{manage_hotlist.imei1}" />
+								<p:confirm header="Confirmation" message="Etes vous Sure?"
+									icon="ui-icon-alert" />
+							</p:commandButton>
+
+							<p:confirmDialog global="true" showEffect="fade"
+								hideEffect="fade">
+								<p:commandButton value="Oui" type="button"
+									styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+								<p:commandButton value="Non" type="button"
+									styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+							</p:confirmDialog>
+						</p:column>
+
+						<f:facet name="footer">
+							<h:panelGrid columns="2">
+
+								<p:commandButton process=":form1:tabview:singleDT2"
+									style="width:100%" icon="ui-icon-plusthick" value="Ajouter"
+									styleClass="btn btn-primary"
+									oncomplete="PF('dlg_ajout_imei').show()" />
+								<p:commandButton process=":form1:tabview:singleDT2"
+									update=":form1:CodeDetailsImei" styleClass="btn btn-info"
+									style="width:100%" action="#{manage_hotlist.loadDetailsImei}"
+									icon="ui-icon-plusthick" value="Details"
+									oncomplete="PF('dlgDetailsImei').show()" />
+
+							</h:panelGrid>
+						</f:facet>
+
+					</p:dataTable>
+				</p:tab>
+
+			</p:tabView>
+
+
+
+			<p:dialog header="Ajout" widgetVar="dlg_ajout_appele"
+				id="panajoutappele">
+
+				<h:panelGrid columns="2" id="pn1">
+
+					<p:outputLabel value="Nom" />
+					<p:inputText value="#{manage_hotlist.appele.nom}">
+
+					</p:inputText>
+
+					<p:commandButton process="pn1" value="Ajouter" styleClass="btn btn-primary"
+						action="#{manage_hotlist.ajoutAppele()}"
+						update=":form1:tabview:singleDT,:form1:panajoutappele"
+						oncomplete="PF('dlg_ajout_appele').hide();" />
+					<p:commandButton value="Annuler" styleClass="btn btn-danger"
+						onclick="PF('dlg_ajout_appele').hide()" />
+
+				</h:panelGrid>
+			</p:dialog>
+
+			<p:dialog header="Ajout" widgetVar="dlg_ajout_cellid"
+				id="panajoutcellid">
+
+				<h:panelGrid columns="2" id="pn7">
+
+					<p:outputLabel value="Nom" />
+					<p:inputText value="#{manage_hotlist.cellid.nom}">
+					</p:inputText>
+
+					<p:commandButton process="pn7" value="Ajouter"
+						styleClass="btn btn-primary"
+						action="#{manage_hotlist.addCellid()}"
+						update=":form1:tabview:singleDT3,:form1:panajoutcellid"
+						oncomplete="PF('dlg_ajout_appele').hide();" />
+					<p:commandButton value="Annuler" styleClass="btn btn-danger"
+						onclick="PF('dlg_ajout_cellid').hide()" />
+
+				</h:panelGrid>
+			</p:dialog>
+
+			<p:dialog header="Ajout" widgetVar="dlg_ajout_appelant"
+				id="panajoutappelant" dynamic="true">
+
+				<h:panelGrid columns="2" id="pn2">
+
+					<p:outputLabel value="Nom" />
+					<p:inputText value="#{manage_hotlist.appelant.nom}">
+
+					</p:inputText>
+
+					<p:commandButton process="pn2" value="Ajouter"
+						action="#{manage_hotlist.addAppelant()}"
+						styleClass="btn btn-primary"
+						update=":form1:tabview:singleDT1,:form1:panajoutappelant"
+						oncomplete="PF('dlg_ajout_appelant').hide();" />
+					<p:commandButton value="Annuler" styleClass="btn btn-danger"
+						onclick="PF('dlg_ajout_appelant').hide()" />
+
+				</h:panelGrid>
+			</p:dialog>
+
+			<p:dialog header="Modification" widgetVar="dlg4" dynamic="true">
+				<p:outputPanel id="Modif" style="text-align:center;">
+					<h:panelGrid>
+
+						<p:outputLabel value="Nom" />
+						<p:inputText value="#{manage_hotlist.appele1.nom}">
+
+						</p:inputText>
+
+						<p:commandButton value="Valider" update=":form1:tabview:singleDT"
+							action="#{manage_hotlist.modifAppele()}"
+							styleClass="btn btn-primary" oncomplete="PF('dlg4').hide()" />
+						<p:commandButton value="Annuler" onclick="PF('dlg4').hide()"
+							styleClass="btn btn-danger" />
+					</h:panelGrid>
+
+				</p:outputPanel>
+			</p:dialog>
+
+			<p:dialog header="Ajout" widgetVar="dlg_ajout_imei" id="panajoutimei"
+				dynamic="true">
+
+				<h:panelGrid columns="2" id="pn3">
+
+					<p:outputLabel value="Nom" />
+					<p:inputText value="#{manage_hotlist.imei.nom}">
+
+					</p:inputText>
+					<p:commandButton process="pn3" value="Ajouter"
+						styleClass="btn btn-primary" action="#{manage_hotlist.addImei()}"
+						update=":form1:tabview:singleDT2,:form1:panajoutimei"
+						oncomplete="PF('dlg_ajout_imei').hide();" />
+					<p:commandButton value="Annuler" styleClass="btn btn-danger"
+						onclick="PF('dlg_ajout_imei').hide()" />
+
+				</h:panelGrid>
+			</p:dialog>
+
+			<p:dialog header="Modification" widgetVar="dlgmodifappelant"
+				dynamic="true">
+				<p:outputPanel id="Modifappelant" style="text-align:center;">
+					<h:panelGrid>
+
+						<p:outputLabel value="Nom" />
+						<p:inputText value="#{manage_hotlist.appelant1.nom}">
+
+						</p:inputText>
+
+						<p:commandButton value="Valider" update=":form1:tabview:singleDT1"
+							action="#{manage_hotlist.modifAppelant()}"
+							styleClass="btn-primary"
+							oncomplete="PF('dlgmodifappelant').hide()" />
+						<p:commandButton value="cancel" styleClass="btn btn-danger"
+							onclick="PF('dlgmodifappelant').hide()" />
+					</h:panelGrid>
+
+				</p:outputPanel>
+			</p:dialog>
+
+			<p:dialog header="Modification" widgetVar="dlgmodifimei"
+				dynamic="true">
+				<p:outputPanel id="ModifImei" style="text-align:center;">
+					<h:panelGrid>
+
+						<p:outputLabel value="Nom" />
+						<p:inputText value="#{manage_hotlist.imei1.nom}">
+
+						</p:inputText>
+						<p:commandButton value="Valider" update=":form1:tabview:singleDT2"
+							action="#{manage_hotlist.modifImei()}"
+							styleClass="btn btn-primary"
+							oncomplete="PF('dlgmodifimei').hide()" />
+						<p:commandButton value="Annuler" styleClass="btn btn-danger"
+							onclick="PF('dlgmodifimei').hide()" />
+					</h:panelGrid>
+
+				</p:outputPanel>
+			</p:dialog>
+
+			<p:dialog header="Details" widgetVar="dlg5">
+				<p:outputPanel id="CodeDetails" style="text-align:center;">
+					<p:dataTable styleClass="myTable" id="DetTable"
+						value="#{manage_hotlist.list_det_appele}" var="det" rows="15"
+						paginator="true" rowKey="#{det.id}">
+						<p:column filterBy="#{det.hotlistnumber}" headerText="N° Hotlist">
+							<h:outputText value="#{det.hotlistnumber}" />
+						</p:column>
+						<p:column headerText="Nom Utilisateur">
+							<h:outputText value="#{det.nomUtilisateur}" />
+						</p:column>
+						<p:column headerText="Date Creation">
+							<h:outputText value="#{det.dateModif}" />
+						</p:column>
+						<p:column style="width:100px;text-align: center">
+							<p:commandButton process="DetTable" value="update"
+								style="color:#fff; background: rgb(28, 184, 65) ; border-color: #d73925 ;"
+								icon="ui-icon-arrowrefresh-1-w" title="Modifier"
+								update=":form1:panmodifap" oncomplete="PF('dlgmodifap').show();">
+								<f:setPropertyActionListener value="#{det}"
+									target="#{manage_hotlist.detailsappele1}" />
+							</p:commandButton>
+						</p:column>
+						<p:column style="width:100px;text-align: center">
+							<p:commandButton process="DetTable" update="DetTable"
+								icon="ui-icon-trash" title="Supprimer" value="delete"
+								action="#{manage_hotlist.suppDetailsAppele()}">
+								<f:setPropertyActionListener value="#{det}"
+									target="#{manage_hotlist.detailsappele1}" />
+								<p:confirm header="Confirmation" message="Etes vous Sure?"
+									icon="ui-icon-alert" />
+							</p:commandButton>
+
+							<p:confirmDialog global="true" showEffect="fade"
+								hideEffect="fade">
+								<p:commandButton value="Oui" type="button"
+									styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+								<p:commandButton value="Non" type="button"
+									styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+							</p:confirmDialog>
+						</p:column>
+
+						<f:facet name="footer">
+							<p:commandButton process="DetTable" icon="ui-icon-plusthick"
+								styleClass="btn btn-primary" value="Ajouter"
+								oncomplete="PF('dlg3').show()" />
+
+						</f:facet>
+					</p:dataTable>
+
+				</p:outputPanel>
+			</p:dialog>
+
+			<p:dialog header="Ajout" widgetVar="dlg3" id="panajoutdetappele"
+				dynamic="true">
+				<h:panelGrid>
+
+					<p:outputLabel value="N° Hotlist" />
+					<p:inputText value="#{manage_hotlist.detailsappele.hotlistnumber}" />
+					<p:commandButton update="DetTable,:form1:panajoutdetappele"
+						process="@form" value="Ajouter" styleClass="btn btn-primary"
+						action="#{manage_hotlist.addDetailsAppele}"
+						oncomplete="PF('dlg3').hide()" />
+
+				</h:panelGrid>
+			</p:dialog>
+
+			<p:dialog header="Modifier" widgetVar="dlgmodifap" dynamic="true">
+				<p:outputPanel id="panmodifap">
+					<h:panelGrid>
+
+						<p:outputLabel value="N° Hotlist" />
+						<p:inputText
+							value="#{manage_hotlist.detailsappele1.hotlistnumber}" />
+
+						<p:commandButton update="DetTable" process="@form"
+							style="color:#fff; background: rgb(28, 184, 65) ; border-color: #d73925 ;"
+							value="Modifier" action="#{manage_hotlist.modifierDetailsAppele}"
+							oncomplete="PF('dlgmodifap').hide()" />
+
+					</h:panelGrid>
+				</p:outputPanel>
+			</p:dialog>
+
+			<p:dialog header="Details" widgetVar="dlgDetailsApp" dynamic="true">
+				<p:outputPanel id="CodeDetailsAppelant" style="text-align:center;">
+					<p:dataTable styleClass="myTable" id="DetTable1"
+						value="#{manage_hotlist.list_det_appelant}" paginator="true"
+						rows="15" var="det">
+						<p:column filterBy="#{det.hotlistnumber}" headerText="N° Hotlist">
+							<h:outputText value="#{det.hotlistnumber}" />
+						</p:column>
+						<p:column headerText="Nom Utilisateur">
+							<h:outputText value="#{det.nomUtilisateur}" />
+						</p:column>
+						<p:column headerText="Date Creation">
+							<h:outputText value="#{det.dateModif}" />
+						</p:column>
+						<p:column style="width:100px;text-align: center">
+							<p:commandButton process="DetTable1" value="update"
+								style="color:#fff; background: rgb(28, 184, 65) ; border-color: #d73925 ;"
+								icon="ui-icon-arrowrefresh-1-w" title="Modifier"
+								update=":form1:panmodifdetapelant"
+								oncomplete="PF('dlgmodifdetap').show();">
+								<f:setPropertyActionListener value="#{det}"
+									target="#{manage_hotlist.detailsappelant1}" />
+							</p:commandButton>
+						</p:column>
+						<p:column style="width:100px;text-align: center">
+							<p:commandButton process="DetTable1" update="DetTable1"
+								icon="ui-icon-trash" title="Supprimer" value="delete"
+								styleClass="btn btn-danger"
+								action="#{manage_hotlist.deleteDetailAppelant()}">
+								<f:setPropertyActionListener value="#{det}"
+									target="#{manage_hotlist.detailsappelant1}" />
+								<p:confirm header="Confirmation" message="Etes vous Sure?"
+									icon="ui-icon-alert" />
+							</p:commandButton>
+
+							<p:confirmDialog global="true" showEffect="fade"
+								hideEffect="fade">
+								<p:commandButton value="Oui" type="button"
+									styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+								<p:commandButton value="Non" type="button"
+									styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+							</p:confirmDialog>
+						</p:column>
+
+						<f:facet name="footer">
+
+							<h:panelGrid columns="2">
+
+								<p:commandButton process="DetTable1" icon="ui-icon-plusthick"
+									styleClass="btn btn-primary" value="Ajouter"
+									oncomplete="PF('dlgadddetailsapelant').show()" />
+
+
+
+							</h:panelGrid>
+
+						</f:facet>
+					</p:dataTable>
+
+
+
+				</p:outputPanel>
+			</p:dialog>
+
+			<p:dialog header="Ajout" widgetVar="dlgadddetailsapelant"
+				id="panajoutdetape" dynamic="true">
+				<h:panelGrid>
+
+					<p:outputLabel value="N° Hotlist" />
+					<p:inputText
+						value="#{manage_hotlist.detailsappelant.hotlistnumber}" />
+
+
+
+
+					<p:commandButton update="DetTable1,:form1:panajoutdetape"
+						process="@form" value="Ajouter" styleClass="btn btn-primary"
+						action="#{manage_hotlist.addDetailAppelant}"
+						oncomplete="PF('dlgadddetailsapelant').hide()" />
+
+				</h:panelGrid>
+			</p:dialog>
+
+			<p:dialog header="Modifier" widgetVar="dlgmodifdetap" dynamic="true">
+				<p:outputPanel id="panmodifdetapelant">
+					<h:panelGrid>
+
+						<p:outputLabel value="N° Hotlist" />
+						<p:inputText
+							value="#{manage_hotlist.detailsappelant1.hotlistnumber}" />
+
+
+
+
+						<p:commandButton update="DetTable1" process="@form"
+							style="color:#fff; background: rgb(28, 184, 65) ; border-color: #d73925 ;"
+							value="Modifier" action="#{manage_hotlist.modifDetailAppelant}"
+							oncomplete="PF('dlgmodifdetap').hide()" />
+
+					</h:panelGrid>
+				</p:outputPanel>
+			</p:dialog>
+
+			<p:dialog header="Details" widgetVar="dlgDetailsImei" dynamic="true">
+				<p:outputPanel id="CodeDetailsImei" style="text-align:center;">
+					<p:dataTable styleClass="myTable" id="DetTable2"
+						value="#{manage_hotlist.list_det_imei}" paginator="true" rows="15"
+						var="det">
+						<p:column filterBy="#{det.hotlistnumber}" headerText="N° Hotlist">
+							<h:outputText value="#{det.hotlistnumber}" />
+						</p:column>
+						<p:column headerText="Nom Utilisateur">
+							<h:outputText value="#{det.nomUtilisateur}" />
+						</p:column>
+						<p:column headerText="Date Creation">
+							<h:outputText value="#{det.dateModif}" />
+						</p:column>
+						<p:column style="width:100px;text-align: center">
+							<p:commandButton process="DetTable2" value="update"
+								style="color:#fff; background: rgb(28, 184, 65) ; border-color: #d73925 ;"
+								icon="ui-icon-arrowrefresh-1-w" title="Modifier"
+								update=":form1:panmodifdetimei"
+								oncomplete="PF('dlgmodifdetimei').show();">
+								<f:setPropertyActionListener value="#{det}"
+									target="#{manage_hotlist.detailsimei1}" />
+							</p:commandButton>
+						</p:column>
+						<p:column style="width:100px;text-align: center">
+							<p:commandButton process="DetTable2" update="DetTable2"
+								value="delete" icon="ui-icon-trash" title="Supprimer"
+								styleClass="btn btn-danger"
+								action="#{manage_hotlist.deleteDetailImei()}">
+								<f:setPropertyActionListener value="#{det}"
+									target="#{manage_hotlist.detailsimei1}" />
+								<p:confirm header="Confirmation" message="Etes vous Sure?"
+									icon="ui-icon-alert" />
+							</p:commandButton>
+
+							<p:confirmDialog global="true" showEffect="fade"
+								hideEffect="fade">
+								<p:commandButton value="Oui" type="button"
+									styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+								<p:commandButton value="Non" type="button"
+									styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+							</p:confirmDialog>
+						</p:column>
+
+
+						<f:facet name="footer">
+
+							<h:panelGrid columns="2">
+
+								<p:commandButton process="DetTable2" icon="ui-icon-plusthick"
+									styleClass="btn btn-primary" value="Ajouter"
+									oncomplete="PF('dlgadddetailsimei').show()" />
+
+
+
+							</h:panelGrid>
+
+						</f:facet>
+					</p:dataTable>
+
+
+
+				</p:outputPanel>
+			</p:dialog>
+
+			<p:dialog header="Ajout" widgetVar="dlgadddetailsimei"
+				id="panajoutdetimei" dynamic="true">
+				<h:panelGrid>
+
+					<p:outputLabel value="N° Hotlist" />
+					<p:inputText value="#{manage_hotlist.detailsimei.hotlistnumber}" />
+					<p:commandButton update="DetTable2,:form1:panajoutdetimei"
+						process="@form" value="Ajouter" styleClass="btn btn-primary"
+						action="#{manage_hotlist.addDetailImei()}"
+						oncomplete="PF('dlgadddetailsimei').hide()" />
+
+				</h:panelGrid>
+			</p:dialog>
+
+			<p:dialog header="Modifier" widgetVar="dlgmodifdetimei"
+				dynamic="true">
+				<p:outputPanel id="panmodifdetimei">
+					<h:panelGrid>
+
+						<p:outputLabel value="N° Hotlist" />
+						<p:inputText value="#{manage_hotlist.detailsimei1.hotlistnumber}" />
+
+
+
+
+						<p:commandButton update="DetTable2" process="@form"
+							style="color:#fff; background: rgb(28, 184, 65) ; border-color: #d73925 ;"
+							value="Modifier" action="#{manage_hotlist.modifDetailImei()}"
+							oncomplete="PF('').hide(dlgmodifdetimei)" />
+
+					</h:panelGrid>
+				</p:outputPanel>
+			</p:dialog>
+
+			<p:dialog header="Details" widgetVar="dlgDetailsCellId"
+				dynamic="true">
+				<p:outputPanel id="CodeDetailsCellId" style="text-align:center;">
+					<p:dataTable styleClass="myTable" id="DetTable3"
+						value="#{manage_hotlist.list_det_cellid}" paginator="true"
+						rows="15" var="det">
+						<p:column filterBy="#{det.hotlistnumber}" headerText="N° Hotlist">
+							<h:outputText value="#{det.hotlistnumber}" />
+						</p:column>
+						<p:column headerText="Nom Utilisateur">
+							<h:outputText value="#{det.nomUtlisateur}" />
+						</p:column>
+						<p:column headerText="Date Creation">
+							<h:outputText value="#{det.dateModif}" />
+						</p:column>
+						<p:column style="width:100px;text-align: center">
+							<p:commandButton process="DetTable3" value="update"
+								style="color:#fff; background: rgb(28, 184, 65) ; border-color: #d73925 ;"
+								icon="ui-icon-arrowrefresh-1-w" title="Modifier"
+								update=":form1:panmodifdetimei"
+								oncomplete="PF('dlgmodifdetimei').show();">
+								<f:setPropertyActionListener value="#{det}"
+									target="#{manage_hotlist.detailscellid1}" />
+							</p:commandButton>
+						</p:column>
+						<p:column style="width:100px;text-align: center">
+							<p:commandButton process="DetTable3" update="DetTable3"
+								icon="ui-icon-trash" title="Supprimer" value="delete"
+								styleClass="btn btn-danger"
+								action="#{manage_hotlist.deleteDetailCellId()}">
+								<f:setPropertyActionListener value="#{det}"
+									target="#{manage_hotlist.detailscellid1}" />
+								<p:confirm header="Confirmation" message="Etes vous Sure?"
+									icon="ui-icon-alert" />
+							</p:commandButton>
+
+							<p:confirmDialog global="true" showEffect="fade"
+								hideEffect="fade">
+								<p:commandButton value="Oui" type="button"
+									styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+								<p:commandButton value="Non" type="button"
+									styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+							</p:confirmDialog>
+						</p:column>
+
+
+						<f:facet name="footer">
+
+							<h:panelGrid columns="2">
+
+								<p:commandButton process="DetTable3" icon="ui-icon-plusthick"
+									styleClass="btn btn-primary" value="Ajouter"
+									oncomplete="PF('dlgadddetailscell').show()" />
+
+
+
+							</h:panelGrid>
+
+						</f:facet>
+					</p:dataTable>
+
+
+
+				</p:outputPanel>
+			</p:dialog>
+
+			<p:dialog header="Ajout" widgetVar="dlgadddetailscell"
+				id="panajoutdetcell" dynamic="true">
+				<h:panelGrid>
+
+					<p:outputLabel value="N° Hotlist" />
+					<p:inputText value="#{manage_hotlist.detailscellid.hotlistnumber}" />
+
+
+
+
+					<p:commandButton update="DetTable3,:form1:panajoutdetcell"
+						process="@form" value="Ajouter" styleClass="btn btn-primary"
+						action="#{manage_hotlist.addDetailCellId()}"
+						oncomplete="PF('dlgadddetailscell').hide()" />
+
+				</h:panelGrid>
+			</p:dialog>
+
+			<p:dialog header="Modifier" widgetVar="dlgmodifdetcell"
+				dynamic="true">
+				<p:outputPanel id="panmodifdetcell">
+					<h:panelGrid>
+
+						<p:outputLabel value="N° Hotlist" />
+						<p:inputText
+							value="#{manage_hotlist.detailscellid1.hotlistnumber}" />
+
+
+
+
+						<p:commandButton update="DetTable3" process="@form"
+							style="color:#fff; background: rgb(28, 184, 65) ; border-color: #d73925 ;"
+							value="Modifier" action="#{manage_hotlist.modifDetailCellId()}"
+							oncomplete="PF('dlgmodifdetcell').hide()" />
+
+					</h:panelGrid>
+				</p:outputPanel>
+			</p:dialog>
+
+		</h:form>
+	</ui:define>
+</ui:composition>

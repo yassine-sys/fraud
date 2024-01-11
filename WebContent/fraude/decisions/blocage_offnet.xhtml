@@ -1,0 +1,100 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui" xmlns:hf="http://highfaces.org"
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	xmlns:mohawrapper="http://java.sun.com/jsf/composite/jsf2leaf"
+	template="/template2/index.xhtml">
+
+	<ui:define name="pageTitle">Add bloc</ui:define>
+
+
+	<ui:define name="pagecontent">
+
+		<h:form id="form1">
+			<p:growl id="growl" showDetail="true" sticky="true" life="3000" />
+			<!--  rendered="#{tabMenuNavigationBean.pan_fraude}"> -->
+			<p:panel header="Blocage type">
+				<p:selectOneRadio id="bloc"
+					value="#{fraude_block_offnet.typeBlocage}" unselectable="true">
+					<f:selectItem itemLabel="OnNet" itemValue="OnNet" />
+					<f:selectItem itemLabel="OffNet" itemValue="OffNett" />
+				</p:selectOneRadio>
+
+			</p:panel>
+
+			<p:panel>
+				<p:panelGrid columns="4">
+					<h:outputLabel value="Number" />
+					<p:inputTextarea rows="10" cols="55"
+						value="#{fraude_block_offnet.textofnum}">
+					</p:inputTextarea>
+
+					<p:selectOneMenu value="#{fraude_block_offnet.choix}">
+						<f:selectItem itemLabel="blocage" itemValue="blocage" />
+						<f:selectItem itemLabel="deblocage" itemValue="deblocage" />
+						<f:selectItem itemLabel="WhiteList" itemValue="WhiteList" />
+						<f:selectItem itemLabel="Blocage SMS" itemValue="blocageSMS" />
+						<f:selectItem itemLabel="deblocage SMS" itemValue="deblocageSMS" />
+					</p:selectOneMenu>
+					<p:commandButton value="Execut" styleClass="btn btn-primary"
+						validateClient="true"
+						action="#{fraude_block_offnet.execCommande()}" ajax="true"
+						update="@form,form1:tabnum" onstart="PF('blockUIWidget').block()"
+						oncomplete="PF('blockUIWidget').unblock()"></p:commandButton>
+				</p:panelGrid>
+			</p:panel>
+
+			<p:panel id="tabnum" rendered="true">
+
+				<p:panelGrid columns="2">
+					<p:dataTable value="#{fraude_block_offnet.tabNum}" var="num"
+						id="dtNum" paginator="true" rows="4000" rowKey="#{num}">
+						<f:facet name="header">
+							<h:commandLink>
+								<p:dataExporter type="xls" target="dtNum" fileName="dtNum" />
+								<p:graphicImage library="img" name="excel.png" width="24" />
+							</h:commandLink>
+
+							<h:commandLink>
+								<p:graphicImage library="img" name="pdf.png" width="24" />
+								<pe:exporter type="pdf" target="cdrTable" fileName="RPFraude" />
+							</h:commandLink>
+
+						</f:facet>
+
+						<p:column>
+							<f:facet name="header">
+								<h:outputLabel value="Number" />
+							</f:facet>
+							<h:outputText value="#{num.num}" />
+						</p:column>
+						<p:column>
+							<f:facet name="header">
+								<h:outputLabel value="Return message" />
+							</f:facet>
+							<h:outputText value="#{num.action}" />
+						</p:column>
+						<f:facet name="footer">
+
+						</f:facet>
+					</p:dataTable>
+
+				</p:panelGrid>
+			</p:panel>
+
+			<pe:blockUI widgetVar="blockUIWidget">
+				<h:panelGrid columns="2">
+					<h:graphicImage library="img" name="ajaxloadingbar.gif"
+						style="margin-right: 12px; vertical-align: middle;" />
+					<h:outputText value="Please wait " id="outPut1"
+						style="white-space: nowrap;" />
+				</h:panelGrid>
+			</pe:blockUI>
+
+
+		</h:form>
+	</ui:define>
+</ui:composition>
+

@@ -1,0 +1,211 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	template="/template2/index.xhtml" xmlns:hf="http://highfaces.org"
+	xmlns:pe="http://primefaces.org/ui/extensions">
+
+	<ui:define name="under_content">
+
+		<h:form id="form1">
+
+			<p:dataTable id="singleDT" rowKey="#{user.UId}" var="user"
+				value="#{user_gestion.list_users}">
+				<f:facet name="header">
+					<h:outputText value="List Of Users" />
+				</f:facet>
+				<p:column headerText="Name">
+					<h:outputText value="#{user.UName}" />
+				</p:column>
+
+				<p:column headerText="Login">
+					<h:outputText value="#{user.ULogin}" />
+				</p:column>
+				<p:column headerText="Group">
+					<h:outputText value="#{user.user_group.GName}" />
+				</p:column>
+				<p:column headerText="Mail">
+					<h:outputText value="#{user.UMail}" />
+				</p:column>
+				<p:column headerText="Registration Number">
+					<h:outputText value="#{user.UMatricule}" />
+				</p:column>
+				<p:column headerText="Departement">
+					<h:outputText value="#{user.UDepart}" />
+				</p:column>
+				<p:column headerText="Creation Date">
+					<h:outputText value="#{user.dateCreation}" />
+				</p:column>
+				<p:column headerText="State">
+					<h:outputText value="#{user.etat}" />
+				</p:column>
+				<p:column style="width:100px;text-align: center">
+					<p:commandButton process="singleDT" icon="ui-icon-arrowrefresh-1-w"
+						value="update"
+						style="color:#fff; background: rgb(28, 184, 65) ; border-color: #d73925 ;"
+						title="Update" action="#{user_gestion.onselectuser()}"
+						update=":form1:planDetail" oncomplete="PF('dlgmodifUser').show();">
+						<f:setPropertyActionListener value="#{user}"
+							target="#{user_gestion.user}" />
+					</p:commandButton>
+				</p:column>
+				<p:column style="width:100px;text-align: center">
+					<p:commandButton process="singleDT" update="singleDT"
+						value="delete" icon="ui-icon-trash" title="Delete"
+						styleClass="btn btn-danger" action="#{user_gestion.DeleteUser}">
+						<f:setPropertyActionListener value="#{user}"
+							target="#{user_gestion.user}" />
+						<p:confirm header="Confirmation" message="Etes vous Sure?"
+							icon="ui-icon-alert" />
+					</p:commandButton>
+
+					<p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+						<p:commandButton value="Yes" type="button"
+							styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+						<p:commandButton value="No" type="button"
+							styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+					</p:confirmDialog>
+				</p:column>
+				<f:facet name="footer">
+
+					<p:commandButton process="singleDT" icon="ui-icon-plusthick"
+						styleClass="btn btn-primary" value="Add"
+						oncomplete="PF('dlg3').show()" />
+
+
+				</f:facet>
+			</p:dataTable>
+
+
+			<p:dialog header="Add" widgetVar="dlg3" id="panajoutuser"
+				showEffect="explode">
+				<p:messages id="Dlgaddmessages" showDetail="true" autoUpdate="true" />
+				<h:panelGrid>
+
+					<p:outputLabel value="Name" />
+					<p:inputText id="nom" value="#{user_gestion.user1.UName}"
+						required="true" requiredMessage="Enter Votre Nom"></p:inputText>
+					<p:watermark for="nom" value=" Name *" />
+					<p:message id="message1" for="nom" />
+					<p:outputLabel value="Login" />
+					<h:panelGroup>
+						<p:inputText id="login" value="#{user_gestion.user1.ULogin}"
+							required="true" requiredMessage="Entrer  Login"
+							binding="#{user_gestion.p}">
+							<p:ajax event="blur"
+								onstart="$('#progressind').css('visibility','visible');"
+								oncomplete="$('#progressind').css('visibility','hidden');"
+								listener="#{user_gestion.checkLogin}" />
+						</p:inputText>
+						<img id="progressind"
+							src="../../../resources/img/ajaxloadingbar.gif" width="20"
+							style="margin-left: 10px; border: 0px; visibility: hidden" />
+					</h:panelGroup>
+					<p:messages id="loginmsg" showDetail="true" showSummary="true"
+						closable="true" />
+
+					<p:watermark for="login" value=" Login *" />
+					<p:message id="message2" for="login" />
+					<p:outputLabel value="Password" />
+					<p:password id="pass" value="#{user_gestion.user1.UPwd}"
+						required="true" requiredMessage="Enter password" feedback="true"></p:password>
+					<p:watermark for="pass" value=" Password *" />
+					<p:message id="message3" for="pass" />
+					<p:selectOneMenu id="grp" value="#{user_gestion.user1.user_group}"
+						converter="omnifaces.SelectItemsConverter" required="true"
+						requiredMessage="Choisir Groupe">
+						<f:selectItem itemLabel="Select..." itemValue="" />
+						<f:selectItems value="#{user_gestion.list_groups}" var="cat"
+							itemValue="#{cat}" itemLabel="#{cat.GName}" />
+					</p:selectOneMenu>
+
+					<p:message id="message4" for="grp" />
+					<p:outputLabel value="Mail" />
+					<p:inputText id="email" value="#{user_gestion.user1.UMail}"
+						required="true" requiredMessage="Enter Your Email"
+						validatorMessage="Invalid Format">
+						<f:validateRegex
+							pattern="^[_A-Za-z0-9-\+]+(\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9]+)*(\.[A-Za-z]{2,})$" />
+					</p:inputText>
+					<p:watermark for="email" value="Email Address *" />
+					<p:message id="message" for="email" />
+					<p:outputLabel value="Registration Number" />
+					<p:inputText value="#{user_gestion.user1.UMatricule}"></p:inputText>
+					<p:outputLabel value="Departement" />
+					<p:inputText value="#{user_gestion.user1.UDepart}"></p:inputText>
+
+					<p:commandButton value="Validate" styleClass="btn btn-primary"
+						update="singleDT,:form1:panajoutuser"
+						action="#{user_gestion.createUser()}" ajax="true"
+						validateClient="true" />
+					<p:commandButton value="Cancel" oncomplete="PF('dlg3').hide"
+						styleClass="btn btn-danger" />
+				</h:panelGrid>
+			</p:dialog>
+
+			<p:dialog header="Update" widgetVar="dlgmodifUser"
+				showEffect="explode">
+				<p:messages id="Dlgmodifmessages" showDetail="true"
+					autoUpdate="true" />
+
+				<p:outputPanel id="planDetail">
+					<h:panelGrid rendered="#{not empty user_gestion.user}"
+						columnClasses="label,value" columns="1">
+						<p:outputLabel value="Name" />
+						<p:inputText value="#{user_gestion.user.UName}" required="true"></p:inputText>
+						<p:outputLabel value="Login" />
+						<h:panelGroup>
+							<p:inputText id="login1" value="#{user_gestion.user.ULogin}"
+								required="true" requiredMessage="Entrer  Login"
+								binding="#{user_gestion.p1}">
+								<p:ajax event="blur"
+									onstart="$('#progressind').css('visibility','visible');"
+									oncomplete="$('#progressind').css('visibility','hidden');"
+									listener="#{user_gestion.checkLogin}" />
+							</p:inputText>
+							<img id="progressind1"
+								src="../../../resources/img/ajaxloadingbar.gif" width="20"
+								style="margin-left: 10px; border: 0px; visibility: hidden" />
+						</h:panelGroup>
+						<p:messages id="loginmsg1" showDetail="true" showSummary="true"
+							closable="true" />
+
+						<p:outputLabel value="Password" />
+						<p:password value="#{user_gestion.user.UPwd}" required="true"></p:password>
+						<p:outputLabel
+							value="Group (actuel = #{user_gestion.user.user_group.GName})" />
+						<p:selectOneMenu value="#{user_gestion.selectedgroup}"
+							converter="omnifaces.SelectItemsConverter" required="true"
+							requiredMessage="Groupe Vide ">
+							<f:selectItem itemLabel="Choose..." itemValue="" />
+							<f:selectItems value="#{user_gestion.list_groups}" var="cat"
+								itemValue="#{cat}" itemLabel="#{cat.GName}" />
+						</p:selectOneMenu>
+						<p:outputLabel value="Mail" />
+						<p:inputText value="#{user_gestion.user.UMail}" required="true"
+							requiredMessage="Entrer Votre Email"
+							validatorMessage="Invalid Format">
+							<f:validateRegex
+								pattern="^[_A-Za-z0-9-\+]+(\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9]+)*(\.[A-Za-z]{2,})$" />
+						</p:inputText>
+						<p:outputLabel value="Registration Number" />
+						<p:inputText value="#{user_gestion.user.UMatricule}"
+							required="true"></p:inputText>
+						<p:outputLabel value="Departement" />
+						<p:inputText value="#{user_gestion.user.UDepart}" required="true"></p:inputText>
+
+						<p:commandButton process=":form1:planDetail" value="Valider"
+							update="singleDT" actionListener="#{user_gestion.modifUser()}"
+							validateClient="true" 
+						styleClass="btn btn-primary" />
+						<p:commandButton value="Cancel" oncomplete="PF('dlg4').hide"
+						styleClass="btn btn-danger" />
+					</h:panelGrid> 
+				</p:outputPanel>
+			</p:dialog>
+
+		</h:form>
+	</ui:define>
+</ui:composition>

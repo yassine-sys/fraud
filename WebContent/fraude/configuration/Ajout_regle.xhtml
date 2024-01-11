@@ -1,0 +1,255 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui" template="/template2/index.xhtml"
+	xmlns:hf="http://highfaces.org" xmlns:pe="http://primefaces.org/ui">
+	<ui:define name="pageTitle">Ajouter Fraude</ui:define>
+
+	<ui:define name="pagecontent">
+		<h:form id="form1">
+			<!-- rendered="#{tabMenuNavigationBean.pan_fraude}" />-->
+			<p:panel header="Regle">
+
+				<p:panelGrid columns="2">
+					<h:outputLabel value="Nom Regle" />
+					<p:inputText value="#{fraude.regle.nom}" />
+
+					<h:outputLabel value="Description" />
+					<p:inputText value="#{fraude.regle.description}" />
+
+					<h:outputLabel value="Flux" />
+					<p:selectOneMenu value="#{fraude.flow}"
+						converter="omnifaces.SelectItemsConverter">
+						<p:ajax listener="#{fraude.selectChangeFiltres}" event="change"
+							update="param_menu,filter_menu" />
+						<f:selectItem itemLabel="Choisir..." itemValue="" />
+						<f:selectItems value="#{fraude.fluxs}" var="flux"
+							itemLabel="#{flux.flowName}" itemValue="#{flux}" />
+					</p:selectOneMenu>
+					
+					<h:outputLabel value="Categorie" />
+					<p:selectOneMenu value="#{fraude.regle.categorie}"
+						converter="omnifaces.SelectItemsConverter">
+						<f:selectItem itemLabel="Choisir..." itemValue="" />
+						<f:selectItems value="#{fraude.categories}" var="cat"
+							itemLabel="#{cat.nomCategorie}" itemValue="#{cat}" />
+					</p:selectOneMenu>
+
+					<h:outputLabel value="Type Blocage" />
+					<p:selectOneMenu value="#{fraude.regle.type}">
+						<f:selectItem itemLabel="Choisir..." itemValue="" />
+						<f:selectItem itemLabel="Blocage Automatique" itemValue="0" />
+						<f:selectItem itemLabel="Blocage Manuel" itemValue="1" />
+					</p:selectOneMenu>
+					
+				</p:panelGrid>
+
+			</p:panel>
+
+			<p:panelGrid columns="2">
+				<p:panel header="Paramètres">
+					<p:panelGrid columns="2">
+						<h:outputLabel value="Paramètre" />
+						<p:selectOneMenu id="param_menu"
+							value="#{fraude.parametre_regle_fraude.flow}"
+							converter="omnifaces.SelectItemsConverter">
+
+							<f:selectItem itemLabel="choose parameter " itemValue="" />
+							<f:selectItems value="#{fraude.parametres}" var="cat"
+								itemLabel="#{cat.flowName}" itemValue="#{cat}" />
+
+						</p:selectOneMenu>
+					</p:panelGrid>
+
+					<p:panelGrid columns="3">
+						<h:outputLabel value="Valeurs" />
+						<p:selectOneMenu value="#{fraude.choix_param_valeur}">
+							<f:selectItem itemLabel="Choisir..." itemValue="" />
+							<f:selectItem itemLabel="Egal à " itemValue="egale" />
+							<f:selectItem itemLabel="Supérieur à " itemValue="superieur" />
+							<f:selectItem itemLabel="Inferieur à " itemValue="inferieur" />
+						</p:selectOneMenu>
+
+						<p:spinner value="#{fraude.paramtreValeur}" />
+						<p:commandButton value="Ajouter Parametre"
+							styleClass="btn btn-primary" action="#{fraude.addParametre}"
+							process=":form1" update="tbl" />
+
+					</p:panelGrid>
+
+					<p:dataTable styleClass="myTable" id="tbl" value="#{fraude.liste_parametre_regle}"
+						var="frpr">
+						<p:column headerText="Parametre">
+							<h:outputText value="#{frpr.flow.flowName}" />
+						</p:column>
+						<p:column rendered="#{frpr.vegal!= '-1'}">
+							<h:outputText value="= #{frpr.vegal}" />
+						</p:column>
+						<p:column rendered="#{frpr.vmax!= '-1'}">
+							<h:outputText value=" &lt; #{frpr.vmax}" escape="false" />
+						</p:column>
+						<p:column rendered="#{frpr.vmin!= '-1'}">
+							<h:outputText value=" &gt; #{frpr.vmin}" escape="false" />
+						</p:column>
+						<p:column>
+							<p:commandButton process="tbl" update="tbl" icon="ui-icon-trash" value="delete"
+								styleClass="btn btn-danger" title="Supprimer"
+								action="#{fraude.deleteParametre()}">
+								<f:setPropertyActionListener value="#{frpr}"
+									target="#{fraude.paramter_regle}" />
+							</p:commandButton>
+						</p:column>
+					</p:dataTable>
+
+				</p:panel>
+
+				<p:panel header="Filters" toggleable="true">
+					<p:panelGrid columns="2">
+						<h:outputLabel value="Filter" />
+						<p:selectOneMenu id="filter_menu"
+							value="#{fraude.filtre_regle_fraude.filtreFraude}"
+							converter="omnifaces.SelectItemsConverter">
+							<p:ajax listener="#{fraude.selectChange}" event="change"
+								update="panfil" />
+							<f:selectItem itemLabel="" itemValue="" />
+							<f:selectItems value="#{fraude.filtres}" var="cat"
+								itemLabel="#{cat.filtre}" itemValue="#{cat}" />
+						</p:selectOneMenu>
+					</p:panelGrid>
+
+					<p:panelGrid columns="3">
+						<h:outputLabel value="Valeurs" />
+						<p:selectOneMenu value="#{fraude.choix_filter_valeur}">
+							<p:ajax listener="#{fraude.selectChange}" event="change"
+								update="panfil" />
+							<f:selectItem itemLabel="Choisir..." itemValue="" />
+							<f:selectItem itemLabel="Egal  " itemValue="egale" />
+							<f:selectItem itemLabel="Different " itemValue="different" />
+							<f:selectItem itemLabel="Like  " itemValue="like" />
+							<f:selectItem itemLabel="Not Like  " itemValue="not like" />
+							<f:selectItem itemLabel="Dans List " itemValue="in" />
+						</p:selectOneMenu>
+						<p:outputPanel id="panfil">
+							<p:selectOneMenu value="#{fraude.choix_Vfiltre}"
+								rendered="#{fraude.listTypeDest}">
+								<f:selectItem itemLabel="Choisir..." itemValue="" />
+								<f:selectItems value="#{fraude.typeDests}" var="dest"
+									itemLabel="#{dest.typeDest}" itemValue="#{dest.id}" />
+							</p:selectOneMenu>
+
+							<p:selectOneMenu value="#{fraude.choix_Vfiltre}"
+								rendered="#{fraude.listPlanTarifaire}">
+								<f:selectItem itemLabel="Choisir..." itemValue="" />
+								<f:selectItems value="#{fraude.plans}" var="plan"
+									itemLabel="#{plan.planTarifaire}"
+									itemValue="#{plan.codePlanTarifaire}" />
+							</p:selectOneMenu>
+
+							<p:selectOneMenu value="#{fraude.choix_Vfiltre}"
+								rendered="#{fraude.listinappelant}">
+								<f:selectItem itemLabel="Choisir..." itemValue="" />
+								<f:selectItems value="#{fraude.lstappelant}" var="plan"
+									itemLabel="#{plan.nom}" itemValue="#{plan.id}" />
+							</p:selectOneMenu>
+
+							<p:selectOneMenu value="#{fraude.choix_Vfiltre}"
+								rendered="#{fraude.listinoffre}">
+								<f:selectItem itemLabel="Choisir..." itemValue="" />
+								<f:selectItems value="#{fraude.lst_offres}" var="offre"
+									itemLabel="#{offre.nomOffre}" itemValue="#{offre.idOffre}" />
+							</p:selectOneMenu>
+
+							<p:selectOneMenu value="#{fraude.choix_Vfiltre}"
+								rendered="#{fraude.listinappele}">
+								<f:selectItem itemLabel="Choisir..." itemValue="" />
+								<f:selectItems value="#{fraude.lstappele}" var="plan"
+									itemLabel="#{plan.nom}" itemValue="#{plan.id}" />
+							</p:selectOneMenu>
+
+							<p:selectOneMenu value="#{fraude.choix_Vfiltre}"
+								rendered="#{fraude.listinimei}">
+								<f:selectItem itemLabel="Choisir..." itemValue="" />
+								<f:selectItems value="#{fraude.lstimei}" var="plan"
+									itemLabel="#{plan.nom}" itemValue="#{plan.id}" />
+							</p:selectOneMenu>
+
+							<p:selectOneMenu value="#{fraude.choix_Vfiltre}"
+								rendered="#{fraude.listin}">
+								<f:selectItem itemLabel="Choisir..." itemValue="" />
+								<f:selectItems value="#{fraude.lstcellid}" var="plan"
+									itemLabel="#{plan.nom}" itemValue="#{plan.id}" />
+							</p:selectOneMenu>
+
+							<p:selectOneMenu value="#{fraude.choix_Vfiltre}"
+								rendered="#{fraude.typelocroa}">
+								<f:selectItem itemLabel="Choisir..." itemValue=""
+									noSelectionOption="true" />
+								<f:selectItem itemLabel="Prépayé" itemValue="prp" />
+								<f:selectItem itemLabel="Roaming" itemValue="roa" />
+								<f:selectItem itemLabel="Postpayé" itemValue="pop" />
+								<f:selectItem itemLabel="Etranger" itemValue="etranger" />
+							</p:selectOneMenu>
+
+							<p:selectOneMenu value="#{fraude.choix_Vfiltre}"
+								rendered="#{fraude.typeAppel}">
+								<f:selectItem itemLabel="Choisir..." itemValue=""
+									noSelectionOption="true" />
+								<f:selectItem itemLabel="Local" itemValue="loc" />
+								<f:selectItem itemLabel="Roaming" itemValue="roa" />
+							</p:selectOneMenu>
+
+							<p:inputText id="tes" value="#{fraude.choix_Vfiltre}"
+								rendered="#{fraude.text}" />
+
+						</p:outputPanel>
+					</p:panelGrid>
+
+					<p:commandButton value="Ajouter Filtre"
+						styleClass="btn btn-primary" action="#{fraude.addFiltre}"
+						update="tbl1" process=":form1" ajax="true" />
+
+					<p:dataTable styleClass="myTable" id="tbl1" value="#{fraude.listeFiltresRegle}"
+						var="price">
+
+						<p:column headerText="Filtre">
+							<h:outputText value="#{price.filtreFraude.filtre}" />
+						</p:column>
+
+						<p:column headerText="Like ">
+							<h:outputText value="#{price.vlike}" />
+						</p:column>
+						<p:column headerText="Not Like">
+							<h:outputText value="#{price.vnotlike}" />
+						</p:column>
+						<p:column headerText="Egale à">
+							<h:outputText value="#{price.vegal}" />
+						</p:column>
+						<p:column headerText="Different">
+							<h:outputText value="#{price.vdef}" />
+						</p:column>
+						<p:column headerText="Dans List">
+							<h:outputText value="#{price.inegal}" />
+						</p:column>
+
+						<p:column>
+							<p:commandButton process="tbl1" update="tbl1" value="delete"
+								icon="ui-icon-trash" title="Supprimer" styleClass="btn btn-danger"
+								action="#{fraude.deletefiltre()}">
+								<f:setPropertyActionListener value="#{price}"
+									target="#{fraude.filtre_regle}" />
+							</p:commandButton>
+						</p:column>
+					</p:dataTable>
+
+				</p:panel>
+
+				<p:commandButton styleClass="btn btn-info" style="width:100%"
+					value="valider" actionListener="#{fraude.valider}" />
+
+			</p:panelGrid>
+
+		</h:form>
+
+	</ui:define>
+</ui:composition>

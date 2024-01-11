@@ -1,0 +1,149 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui" template="/template2/index.xhtml"
+	xmlns:hf="http://highfaces.org" xmlns:pe="http://primefaces.org/ui">
+	<ui:define name="pageTitle">Ajouter Fraude</ui:define>
+
+
+	<ui:define name="pagecontent">
+
+		<script>
+		$( "#fraud-conf-dd" ).addClass( "active" );
+		$( "#fraud-conf-dd #item1" ).addClass( "active" );
+		
+		</script>
+		<h:form id="form1">
+
+			<p:dataTable  styleClass="myTable"  id="singleDT" value="#{manage_position.liste_cell}"
+				var="cell">
+				<f:facet name="header">
+					<p:outputLabel value="Gestion Account IN"></p:outputLabel>
+				</f:facet>
+
+				<p:column headerText="Nom">
+					<h:outputText value="#{cell.cellNom}" />
+				</p:column>
+				<p:column headerText="LAC">
+					<h:outputText value="#{cell.lac}" />
+				</p:column>
+				<p:column headerText="Cell">
+					<h:outputText value="#{cell.cellId}" />
+				</p:column>
+				<p:column headerText="Latitude">
+					<h:outputText value="#{cell.latitude}" />
+				</p:column>
+				<p:column headerText="Azimuth">
+					<h:outputText value="#{cell.azimuth}" />
+				</p:column>
+				<p:column headerText="Angle">
+					<h:outputText value="#{cell.angle}" />
+				</p:column>
+				<p:column headerText="Altitude">
+					<h:outputText value="#{cell.altitude}" />
+				</p:column>
+				<p:column headerText="Nom Utilisateur">
+					<h:outputText value="#{cell.nomUtilisateur}" />
+				</p:column>
+				<p:column headerText="Date Création">
+					<h:outputText value="#{cell.dateModif}" />
+				</p:column>
+				<p:column style="width:100px;text-align: center">
+					<p:commandButton process="singleDT" icon="ui-icon-arrowrefresh-1-w"
+						style="color:#fff; background: rgb(28, 184, 65) ; border-color: #d73925 ;"
+						title="Modifier" update=":form1:modifPos" value="update"
+						styleClass="btn btn-success" oncomplete="PF('dlg4').show();">
+						<f:setPropertyActionListener value="#{cell}"
+							target="#{manage_position.cell1}" />
+					</p:commandButton>
+				</p:column>
+				<p:column style="width:100px;text-align: center">
+					<p:commandButton process="singleDT" update="singleDT"
+						icon="ui-icon-trash" title="Supprimer" value="delete"
+						styleClass="btn btn-danger" action="#{manage_position.delete()}">
+						<f:setPropertyActionListener value="#{cell}"
+							target="#{manage_position.cell1}" />
+					</p:commandButton>
+				</p:column>
+				<f:facet name="footer">
+
+
+					<p:commandButton process="singleDT" icon="ui-icon-plusthick"
+						styleClass="btn btn-primary" value="Ajouter"
+						oncomplete="PF('dlg3').show()" />
+
+
+				</f:facet>
+
+			</p:dataTable>
+			<p:dialog  header="Ajout" widgetVar="dlg3" id="panajoutcell">
+				<h:panelGrid columns="2">
+					<p:outputLabel value="Cell" />
+					<p:inputText value="#{manage_position.cell.cellId}" />
+					<p:outputLabel value="Lac" />
+					<p:inputText value="#{manage_position.cell.lac}" />
+					<p:outputLabel value="Nom" />
+					<p:inputText value="#{manage_position.cell.cellNom}" />
+
+					<p:outputLabel value="Altitude" />
+					<p:inputText value="#{manage_position.cell.altitude}" />
+					<p:outputLabel value="Latitude" />
+					<p:inputText value="#{manage_position.cell.latitude}" />
+					<p:outputLabel value="Angle" />
+					<p:inputText value="#{manage_position.cell.angle}" />
+					<p:outputLabel value="Azimuth" />
+					<p:inputText value="#{manage_position.cell.azimuth}" />
+
+					<p:outputLabel value="Type" />
+					<p:selectOneMenu value="#{manage_position.cell.type}">
+						<f:selectItem itemLabel="Choisir..." itemValue=" " />
+						<f:selectItem itemLabel="2G" itemValue="2g" />
+						<f:selectItem itemLabel="3G" itemValue="3g" />
+					</p:selectOneMenu>
+					<p:commandButton value="Valider" styleClass="btn btn-primary"
+						update="singleDT,:form1:panajoutcell"
+						actionListener="#{manage_position.ajouter}"
+						oncomplete="PF('dlg3').hide()" />
+					<p:commandButton value="Annuler" styleClass="btn btn-danger" onclick="PF('dlg3').hide()" />
+				</h:panelGrid>
+
+
+			</p:dialog>
+			<p:dialog header="Modification" widgetVar="dlg4">
+				<p:outputPanel id="modifPos" style="text-align:center;">
+					<h:panelGrid columns="2">
+
+						<p:outputLabel value="Cell" />
+						<p:inputText value="#{manage_position.cell1.cellId}" />
+						<p:outputLabel value="Lac" />
+						<p:inputText value="#{manage_position.cell1.lac}" />
+						<p:outputLabel value="Nom" />
+						<p:inputText value="#{manage_position.cell1.cellNom}" />
+
+						<p:outputLabel value="Altitude" />
+						<p:inputText value="#{manage_position.cell1.altitude}" />
+						<p:outputLabel value="Latitude" />
+						<p:inputText value="#{manage_position.cell1.latitude}" />
+						<p:outputLabel value="Angle" />
+						<p:inputText value="#{manage_position.cell1.angle}" />
+						<p:outputLabel value="Azimuth" />
+						<p:inputText value="#{manage_position.cell1.azimuth}" />
+
+						<p:outputLabel value="Type" />
+						<p:selectOneMenu value="#{manage_position.cell1.type}">
+							<f:selectItem itemLabel="Choisir..." itemValue=" " />
+							<f:selectItem itemLabel="2G" itemValue="2g" />
+							<f:selectItem itemLabel="3G" itemValue="3g" />
+						</p:selectOneMenu>
+
+						<p:commandButton value="Valider" update="singleDT" styleClass="btn btn-primary"
+							actionListener="#{manage_position.modifier}"
+							oncomplete="PF('dlg4').hide()" />
+						<p:commandButton value="Annuler" styleClass="btn btn-danger" onclick="PF('dlg4').hide()" />
+					</h:panelGrid>
+				</p:outputPanel>
+			</p:dialog>
+		</h:form>
+	</ui:define>
+</ui:composition>

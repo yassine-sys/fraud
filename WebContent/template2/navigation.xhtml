@@ -1,0 +1,93 @@
+<div class="navbar navbar-expand-md navbar-light">
+	<div class="text-center d-md-none w-100">
+		<button type="button" class="navbar-toggler" data-toggle="collapse"
+			data-target="#navbar-navigation">
+			<img src="dash/icons/signpost.png" width="25" height="25"></img>
+			Navigation
+		</button>
+	</div>
+
+	<div class="navbar-collapse collapse" id="navbar-navigation">
+		<ul class="navbar-nav">
+			<li id="fraud-conf-dd" class="nav-item dropdown"><a href="#"
+				class="navbar-nav-link" data-toggle="dropdown"> <img
+					src="#{request.contextPath}/template2/dash/icons/protoboard.png"
+					width="25" height="25"> </img> FRAUD CONFIGURATION <img
+					src="#{request.contextPath}/template2/dash/icons/drop-down-arrow.png"
+					width="10" height="10"></img>
+			</a>
+
+				<div class="dropdown-menu">
+					<a id="item0"
+						href="#{request.contextPath}/fraude/configuration/Ajout_regle.jsf"
+						class="dropdown-item">Add Rule</a> <a id="item1"
+						href="#{request.contextPath}/fraude/configuration/gestion_positions.jsf"
+						class="dropdown-item">Position Management</a> <a id="item2"
+						href="#{request.contextPath}/fraude/configuration/hotlist.jsf"
+						class="dropdown-item">Hot List</a> <a id="item3"
+						href="#{request.contextPath}/fraude/configuration/manage_regles.jsf"
+						class="dropdown-item">Rules Management</a> <a id="item4"
+						href="#{request.contextPath}/fraude/configuration/CategoriesFraude.jsf"
+						class="dropdown-item">Categories Management</a>
+				</div></li>
+			<li id="fraud-decision-dd" class="nav-item dropdown"><a href="#"
+				class="navbar-nav-link" data-toggle="dropdown"> <img
+					src="#{request.contextPath}/template2/dash/icons/protoboard.png"
+					width="25" height="25"> </img> FRAUD DECISIONS MANAGEMENT <img
+					src="#{request.contextPath}/template2/dash/icons/drop-down-arrow.png"
+					width="10" height="10"></img>
+			</a>
+
+				<div class="dropdown-menu">
+					<a id="item0"
+						href="#{request.contextPath}/fraude/decisions/manage_decision.jsf"
+						class="dropdown-item">Decision Management</a> <a id="item1"
+						href="#{request.contextPath}/fraude/decisions/blocage.jsf"
+						class="dropdown-item">Blocking</a> <a id="item2"
+						href="#{request.contextPath}/fraude/decisions/blocage_url.jsf"
+						class="dropdown-item">Second Blocking</a> <a id="item3"
+						href="#{request.contextPath}/fraude/decisions/blocage_new.jsf"
+						class="dropdown-item">New Blocking</a> <a id="item4"
+						href="#{request.contextPath}/fraude/decisions/blocage_offnet.jsf"
+						class="dropdown-item">Offnet Blocking</a> <a id="item5"
+						href="#{request.contextPath}/fraude/decisions/StatFraude.jsf"
+						class="dropdown-item">Fraud Statistics</a>
+				</div></li>
+			<li id="fraud-warnings-dd" class="nav-item dropdown"><a href="#"
+				class="navbar-nav-link" data-toggle="dropdown"> <img
+					src="#{request.contextPath}/template2/dash/icons/protoboard.png"
+					width="25" height="25"> </img> FRAUD WARNINGS <img
+					src="#{request.contextPath}/template2/dash/icons/drop-down-arrow.png"
+					width="10" height="10"></img>
+			</a>
+
+				<div class="dropdown-menu">
+					<a id="item0"
+						href="#{request.contextPath}/fraude/warnings/alerte_fraude.jsf"
+						class="dropdown-item">Warnings</a> <a id="item1"
+						href="#{request.contextPath}/fraude/warnings/alertemsisdn.jsf"
+						class="dropdown-item">Alarms</a> <a id="item2"
+						href="#{request.contextPath}/fraude/warnings/StatFraude.jsf"
+						class="dropdown-item">Fraud Statistics</a>
+				</div></li>
+			<li class="nav-item dropdown"><a href="#"
+				class="navbar-nav-link" data-toggle="dropdown"> <img
+					src="#{request.contextPath}/template2/dash/icons/protoboard.png"
+					width="25" height="25"> </img> User Management <img
+					src="#{request.contextPath}/template2/dash/icons/drop-down-arrow.png"
+					width="10" height="10"></img>
+			</a>
+
+				<div class="dropdown-menu">
+					<a
+						href="#{request.contextPath}/fraude/administration/management/profiling_user.jsf"
+						class="dropdown-item">Manage User</a> <a
+						href="#{request.contextPath}/fraude/administration/management/profiling_group.jsf"
+						class="dropdown-item">Manage Groups</a>
+				</div></li>
+
+		</ul>
+
+	</div>
+
+</div>

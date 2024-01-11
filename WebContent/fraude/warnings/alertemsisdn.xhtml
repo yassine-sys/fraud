@@ -1,0 +1,231 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui" template="/template2/index.xhtml"
+	xmlns:hf="http://highfaces.org"
+	xmlns:pe="http://primefaces.org/ui/extensions">
+
+	<ui:define name="pageTitle">Ajouter Fraude</ui:define>
+
+
+	<ui:define name="pagecontent">
+		<h:form id="form1"> <!-- rendered="#{tabMenuNavigationBean.pan_fraude}"> -->
+
+			<p:dataTable paginator="true" rows="5" styleClass="myTable" paginatorPosition="bottom"
+				value="#{alertes_fraude_deux.liste_msisdn}" var="fraudeur"
+				selection="#{alertes_fraude_deux.selected_msisdn}"
+				rowKey="#{fraudeur[0]}" selectionMode="single">
+				<p:ajax event="rowSelect" update=":form1:tblalerte,:form1:gmap"
+					listener="#{alertes_fraude_deux.selectRegle()}" />
+
+				<p:column sortBy="#{fraudeur[0]}" headerText="MSISDN"
+					filterBy="#{fraudeur[0]}">
+					<h:outputText value="#{fraudeur[0]}" />
+				</p:column>
+				<p:column sortBy="#{fraudeur[1]}" headerText="Number Of Rules">
+					<h:outputText value="#{fraudeur[1]}" />
+				</p:column>
+
+
+			</p:dataTable>
+
+
+			<p:panel header="Per Date">
+				<p:selectOneRadio value="#{alertes_fraude_deux.typeDate}">
+					<p:ajax event="change" process="@form"
+						listener="#{alertes_fraude_deux.affichParDate}" update="@form" />
+					<f:selectItem itemLabel="Per Decision Date" itemValue="ParDate" />
+					<f:selectItem itemLabel="All" itemValue="All" />
+				</p:selectOneRadio>
+			</p:panel>
+
+			<p:panel header="Periode" id="panPeriode"
+				rendered="#{alertes_fraude_deux.parDate}">
+				<h:panelGrid columns="2">
+					<h:outputLabel value="Start Date" />
+					<p:calendar value="#{alertes_fraude_deux.dateDebut}">
+
+
+					</p:calendar>
+					<h:outputLabel value="End Date" />
+					<p:calendar value="#{alertes_fraude_deux.dateFin}">
+
+					</p:calendar>
+
+				</h:panelGrid>
+				<p:commandButton value="Refresh" ajax="true" process="@form" styleClass="btn btn-primary"
+					onstart="PF('blockUIWidget').block()"
+					oncomplete="PF('blockUIWidget').unblock()"
+					action="#{alertes_fraude_deux.getDecisionsParDate}"
+					update=":form1:tblalerte"></p:commandButton>
+			</p:panel>
+
+
+
+
+
+
+
+			<p:dataTable value="#{alertes_fraude_deux.listeAlerte}" styleClass="myTable"
+				paginator="true" rows="6" var="alerte" id="tblalerte"
+				rowKey="#{alerte[1]}"
+				selection="#{alertes_fraude_deux.selected_alerte}"
+				selectionMode="single">
+				<p:ajax event="rowDblselect" onstart="PF('blockUIWidget').block()"
+					oncomplete="PF('blockUIWidget').unblock();PF('dlg3').show()"
+					listener="#{alertes_fraude_deux.loadIdentitéCdr()}"
+					update=":form1:tabdetails" />
+
+				<p:column headerText="Regle">
+					<h:outputText value="#{alerte[0]}" />
+				</p:column>
+
+				<p:column headerText="Start Date">
+					<h:outputText value="#{alerte[2]}" />
+				</p:column>
+				<p:column headerText="End Date">
+					<h:outputText value="#{alerte[3]}" />
+				</p:column>
+				<p:column headerText="Detection Date">
+					<h:outputText value="#{alerte[4]}" />
+				</p:column>
+				<p:column headerText="Number of occurrences">
+					<h:outputText value="#{alerte[5]}" />
+				</p:column>
+
+				<f:facet name="footer">
+
+					<p:commandButton process="tblalerte" icon="ui-icon-plusthick" styleClass="btn btn-info"
+						value="Details"
+						actionListener="#{alertes_fraude_deux.loadIdentitéCdr()}"
+						update=":form1:tabdetails" oncomplete="PF('dlg3').show()" />
+
+				</f:facet>
+			</p:dataTable>
+
+			<p:dialog header="Decision" widgetVar="dlg3" showEffect="explode"
+				hideEffect="bounce">
+				<p:tabView id="tabdetails" prependId="false" dynamic="true"
+					cache="false" onTabShow="$(window).trigger('resize')">
+					<p:tab  title="Identity">
+
+						<p:panelGrid columns="2" id="tblparam">
+							<p:dataTable styleClass="myTable" value="#{alertes_fraude_deux.liste_parametres}"
+								paginator="true" rows="6" var="paramitre">
+								<f:facet name="header">
+									<p:outputLabel value="Setting"></p:outputLabel>
+								</f:facet>
+								<p:column headerText="Setting">
+									<h:outputText value="#{paramitre[0]}" />
+								</p:column>
+								<p:column headerText="Value">
+									<h:outputText value="#{paramitre[1]}" />
+								</p:column>
+								<p:column headerText="Start ">
+									<h:outputText value="#{paramitre[2]}" />
+								</p:column>
+								<p:column headerText="End Date">
+									<h:outputText value="#{paramitre[3]}" />
+								</p:column>
+
+
+							</p:dataTable>
+							<p:panel id="pan">
+								<f:facet name="header">
+									<h:graphicImage value="/resources/img/user_icon.png" />
+									<h:outputLabel value="Identity" />
+								</f:facet>
+								<p:panelGrid columns="2">
+									<p:outputLabel value="Number : " />
+									<p:outputLabel value="#{alertes_fraude_deux.identities[1]}" />
+									<p:outputLabel value="Name :" />
+									<p:outputLabel value="#{alertes_fraude_deux.identities[2]}" />
+									<p:outputLabel value="Countries :" />
+									<p:outputLabel value="#{alertes_fraude_deux.identities[4]}" />
+									<p:outputLabel value="Class" />
+									<p:outputLabel value="#{alertes_fraude_deux.identities[3]}" />
+									<p:outputLabel value="Activation Date :" />
+									<p:outputLabel value="#{alertes_fraude_deux.identities[12]}" />
+									<p:outputLabel value="Deactivation Date :" />
+									<p:outputLabel value="#{alertes_fraude_deux.identities[13]}" />
+
+								</p:panelGrid>
+								<p:commandButton id="btn" type="button" icon="ui-icon-pin-s" styleClass="btn btn-info"
+									value="Show Map" onclick="PF('dlg').show();" />
+
+
+							</p:panel>
+
+
+						</p:panelGrid>
+
+
+						<p:panelGrid columns="2">
+							<p:commandButton value="Black Liste" update=":form1:tblalerte" styleClass="btn btn-primary"
+								actionListener="#{alertes_fraude_deux.BlackList}"
+								oncomplete="PF('dlg3').hide;" />
+							<p:commandButton value="White Liste" update=":form1:tblalerte" styleClass="btn btn-primary"
+								oncomplete="PF('dlg3').hide;" />
+							<p:commandButton value="Black Liste and Deactivation" styleClass="btn btn-primary"
+								update=":form1:tblalerte" oncomplete="PF('dlg3').hide;" />
+							<p:commandButton value="Delete" update=":form1:tblalerte" styleClass="btn btn-primary"
+								oncomplete="PF('dlg3').hide;" />
+						</p:panelGrid>
+					</p:tab>
+					<p:tab title="CDR" rendered="#{alertes_fraude_deux.afficheCDR}">
+						<p:dataTable styleClass="myTable" value="#{alertes_fraude_deux.cdrs}" var="cdr">
+
+						</p:dataTable>
+					</p:tab>
+					<p:tab title="CDR IN Activation"
+						rendered="#{alertes_fraude_deux.affichactivation}">
+						<p:dataTable styleClass="myTable" value="#{alertes_fraude_deux.cdrs_in_activations}"
+							var="cdr">
+							<f:facet name="header">
+								<h:outputLabel value=" List CDRs IN Activation" />
+							</f:facet>
+						</p:dataTable>
+					</p:tab>
+					<p:tab title="CDR IN Recharge"
+						rendered="#{alertes_fraude_deux.affichrecharge}">
+						<p:dataTable styleClass="myTable" value="#{alertes_fraude_deux.cdrs_in_recharge}"
+							var="cdr">
+							<f:facet name="header">
+								<h:outputLabel value=" List CDRs IN Recharge" />
+							</f:facet>
+						</p:dataTable>
+					</p:tab>
+					<p:tab title="CDR IN Transfert"
+						rendered="#{alertes_fraude_deux.affichtransfert}">
+						<p:dataTable styleClass="myTable" value="#{alertes_fraude_deux.cdrs_in_transfert}"
+							var="cdr">
+							<f:facet name="header">
+								<h:outputLabel value=" List CDRs IN Transfert" />
+							</f:facet>
+
+						</p:dataTable>
+					</p:tab>
+
+
+
+
+				</p:tabView>
+			</p:dialog>
+			<p:dialog id="gmapDialog" widgetVar="dlg" width="625" height="400"
+				appendTo="@(body)" modal="true" dynamic="true">
+				<p:gmap id="gmap" center="36.890257,30.707417" zoom="15"
+					type="HYBRID" style="width:100%;height:400px"
+					model="#{alertes_fraude_deux.simpleModel}" />
+			</p:dialog>
+
+			<pe:blockUI widgetVar="blockUIWidget">
+				<h:panelGrid columns="2">
+					<h:graphicImage library="img" name="ajaxloadingbar.gif"
+						style="margin-right: 12px; vertical-align: middle;" />
+					<h:outputText value="Please wait..." style="white-space: nowrap;" />
+				</h:panelGrid>
+			</pe:blockUI>
+		</h:form>
+	</ui:define>
+</ui:composition>

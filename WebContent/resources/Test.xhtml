@@ -1,0 +1,81 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> 
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"> 
+
+<h:head>
+<h:outputScript name="js/jquery.jqplot.js"></h:outputScript>
+<h:outputScript name="js/jquery.jqplot.min.js"></h:outputScript>
+
+</h:head> 
+<body> 
+<h:form>
+
+<p:panel header="Configuration">
+
+	  		   <h:panelGrid columns="2" style="margin-bottom:10px" cellpadding="5">
+	  		    <p:outputLabel for="nomrp" value="Nom du Rapport " />
+	  		   <p:inputText id="nomrp" ></p:inputText>
+	  		   <p:outputLabel for="table" value="Select Table " />
+	  		    
+        <p:selectOneMenu id="table" value="#{UserBean.tbl}"  style="width:125px" >
+            <p:ajax listener="#{UserBean.SetFilters}" event="change" update="grid,advanced,console0" process="@this"/>
+            <f:selectItem itemLabel="Users" itemValue="myuser" />
+            <f:selectItem itemLabel="Cars" itemValue="car" />
+             
+         
+        </p:selectOneMenu>
+	  		   
+      
+        <p:outputLabel for="grid" value="Filters:" />
+        <p:selectManyCheckbox id="grid" value="#{UserBean.selectedCities}" layout="grid" columns="3">
+            <f:selectItems value="#{UserBean.cities}" var="city" itemLabel="#{city}" itemValue="#{city}" />
+        </p:selectManyCheckbox>
+            <p:outputLabel for="console0" value="X:" />
+        <p:selectOneMenu id="console0" value="#{UserBean.x}" onchange="submit()"  style="width:125px">
+            <p:ajax partialSubmit="true" process="@this"></p:ajax>
+           <f:selectItems value="#{UserBean.cities}" var="currentY" itemValue="#{currentY}" itemLabel="#{currentY}"/>
+        </p:selectOneMenu>
+           
+	  				 <p:outputLabel for="advanced" value="Axe Y:" />
+        <p:selectManyMenu id="advanced" value="#{UserBean.liste2}"  
+                          var="t" filter="true" filterMatchMode="contains" showCheckbox="true">
+                           <p:ajax partialSubmit="true" process="@this"></p:ajax>
+            <f:selectItems value="#{UserBean.cities}" var="theme" itemLabel="#{theme}" itemValue="#{theme}" />
+
+            
+
+            <p:column>
+                <h:outputText value="#{t}" />
+            </p:column>
+        </p:selectManyMenu>
+        <p:outputLabel for="TypeChart" value="Select Chart Type " />
+	  		    
+        <p:selectOneMenu id="TypeChart" value="#{UserBean.typeChart}"  style="width:125px" >
+            <p:ajax listener="#{UserBean.SetGraphData()}" event="change" process="@this"/>
+            <f:selectItem itemLabel="Line" itemValue="line" />
+            <f:selectItem itemLabel="Bar" itemValue="bar" />
+             
+         
+        </p:selectOneMenu>
+	  				
+	  			</h:panelGrid>
+
+
+</p:panel>
+
+
+</h:form>
+
+<p:panel id="myPanelGrid" >
+
+
+
+</p:panel>
+<h:form id="form1">
+<p:commandButton id="login_submit" actionListener="#{UserBean.addPanel}"  value="log in" update=":myPanelGrid" />
+</h:form>
+</body> 
+</html>

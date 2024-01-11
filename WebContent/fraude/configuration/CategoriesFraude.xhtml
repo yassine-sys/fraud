@@ -1,0 +1,89 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui" template="/template2/index.xhtml"
+	xmlns:hf="http://highfaces.org">
+
+	<ui:define name="pageTitle">Add Fraud</ui:define>
+
+
+	<ui:define name="pagecontent">
+
+		<script>
+		$( "#fraud-conf-dd" ).addClass( "active" );
+		$( "#fraud-conf-dd #item4" ).addClass( "active" );
+		
+		</script>
+		<h:form id="form1">
+			<!--  rendered="#{tabMenuNavigationBean.pan_fraude}">-->
+
+			<p:dataTable styleClass="myTable" var="cat" id="singleDT"
+				value="#{cate_fraud.listCatFraude}" rowKey="#{cat.id}">
+				<p:column>
+					<f:facet name="header">
+						<p:outputLabel value="Category Name" />
+					</f:facet>
+					<h:outputText value="#{cat.nomCategorie}" />
+				</p:column>
+
+				<p:column style="width:100px;text-align: center">
+					<p:commandButton process="singleDT" icon="ui-icon-arrowrefresh-1-w"
+						title="Update" update=":form1:planDetail" value="update"
+						style="color:#fff; background: rgb(28, 184, 65) ; border-color: #d73925 ;"
+						oncomplete="PF('dlg4').show();">
+						<f:setPropertyActionListener value="#{cat}"
+							target="#{cate_fraud.catFraudSelection}" />
+					</p:commandButton>
+				</p:column>
+
+				<p:column style="width:100px;text-align: center">
+					<p:commandButton process="singleDT" update="singleDT"
+						icon="ui-icon-trash" value="delete" styleClass="btn btn-danger"
+						actionListener="#{cate_fraud.DeleteCategriesFraude()}">
+						<f:setPropertyActionListener value="#{cat}"
+							target="#{cate_fraud.catFraudSelection}" />
+					</p:commandButton>
+				</p:column>
+
+				<f:facet name="footer">
+					<p:commandButton process="singleDT" icon="ui-icon-plusthick"
+						styleClass="btn btn-primary" value="Add"
+						oncomplete="PF('dlg3').show()" />
+				</f:facet>
+			</p:dataTable>
+
+
+			<p:dialog header="Add" widgetVar="dlg3" showEffect="explode"
+				hideEffect="bounce">
+				<p:panelGrid columns="1" id="idpan">
+					<p:outputLabel value="Category Fraude" />
+					<p:inputText value="#{cate_fraud.catFraud.nomCategorie}" />
+				</p:panelGrid>
+				<p:commandButton value="Validate" update="singleDT,idpan"
+					actionListener="#{cate_fraud.AddCategoriesFraude()}"
+					styleClass="btn btn-primary" oncomplete="PF('dlg3').hide()" />
+				<p:commandButton value="Cancel" styleClass="btn btn-danger" oncomplete="PF('dlg3').hide()" />
+
+			</p:dialog>
+
+			<p:dialog header="Modification" widgetVar="dlg4" showEffect="explode"
+				hideEffect="bounce">
+				<p:outputPanel id="planDetail" style="text-align:center;">
+					<p:panelGrid columns="1">
+						<p:outputLabel value="Category Name" />
+						<p:inputText value="#{cate_fraud.catFraudSelection.nomCategorie}" />
+					</p:panelGrid>
+					<p:commandButton value="Validate" update="singleDT,planDetail"
+						styleClass="btn btn-primary"
+						actionListener="#{cate_fraud.UpdateCategoriesFraude()}"
+						oncomplete="PF('dlg4').hide()" />
+					<p:commandButton value="Cancel" styleClass="btn btn-danger" oncomplete="PF('dlg4').hide()" />
+
+				</p:outputPanel>
+			</p:dialog>
+
+
+		</h:form>
+	</ui:define>
+</ui:composition>

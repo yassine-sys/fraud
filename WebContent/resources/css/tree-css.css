@@ -1,0 +1,28 @@
+
+.ui-tree .ui-treenode {
+	background-color: red;
+}
+.ui-growl {
+	position: absolute;
+	top: 10%;
+	left: 77%;
+	z-index: 9999;
+}
+
+
+
+.ui-tree.ui-tree-horizontal {
+	color : red;
+}
+
+.ui-toolbar .ui-button{
+    color: #333;
+    border: none;
+    font-weight: bold;
+    margin-left: 10px;
+    text-shadow: none;
+
+    color:white;
+    text-shadow: 1px 1px 0px #000;
+    background: #44B34D !important;
+}

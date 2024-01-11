@@ -1,0 +1,31 @@
+@CHARSET "ISO-8859-1";
+
+.ui-datatable.myTable th{
+	background-image: -moz-linear-gradient(top, #5a5c51, #e6e6e6) !important;
+}
+
+.addFlowStyle {
+	background-color: #e6cf8b !important;
+	color: black !important;
+}
+
+.addJobButton {
+	background-color: #173e43 ;
+}
+
+.highlight1 {
+	background: #ffffff;
+}
+
+.highlight2 {
+	background: #f5f7ed;
+}
+
+.headerRowText {
+	/*color : #fae596;*/
+	font-size: 15px;
+	position: initial;
+}
+.myHeaderRow  {
+	background-color : #e8edf3;
+}

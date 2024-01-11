@@ -1,0 +1,171 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	 template="/template2/index.xhtml">
+
+	<ui:define name="pagecontent">
+
+		<p:panel id="groupsPanel">
+			<p:dataTable styleClass="myTable" id="ListGroups"
+				value="#{Group_managed_bean.listGroups}" var="g">
+
+				<p:column headerText="Group Name">
+					<h:outputText value="#{g.GName}" />
+				</p:column>
+
+				<p:column headerText="Description">
+					<h:outputText value="#{g.GDescription}" />
+				</p:column>
+
+				<p:column headerText="Creation Date">
+					<h:outputText value="#{g.dateCreation}" />
+				</p:column>
+
+				<p:column headerText="Edit">
+					<!-- 					<p:rowEditor /> -->
+					<p:commandButton title="Edit" icon="ui-icon-pencil" value="Edit"
+						styleClass="btn btn-info" update="editGroupForm"
+						oncomplete="PF('dlgEditGroup').show()">
+						<f:setPropertyActionListener value="#{g}"
+							target="#{Group_managed_bean.selectedGroup}" />
+					</p:commandButton>
+				</p:column>
+
+			</p:dataTable>
+			<f:facet name="footer">
+				<p:commandButton value="Add Group" icon="ui-icon-plus" styleClass="btn btn-primary"
+					oncomplete="PF('dlgAddGroup').show()" />
+			</f:facet>
+		</p:panel>
+
+		<p:dialog id="addGroupDialog" widgetVar="dlgAddGroup" width="500">
+			<h:form id="addGroupForm">
+				<p:growl id="msgs" showDetail="true" escape="false" />
+				<h:outputLabel value="Group name" />
+				<p:inputText value="#{Group_managed_bean.guiGroup.GName}" />
+				<p:panelGrid id="panselect" columns="2">
+					<h:outputLabel for="allmodule" value="Modules" />
+					<p:selectCheckboxMenu id="allmodule"
+						value="#{Group_managed_bean.listmoduleselected}" multiple="true"
+						filter="true" filterMatchMode="startsWith"
+						panelStyle="width:250px">
+
+						<f:selectItems value="#{Group_managed_bean.listAllModules}"
+							itemValue="#{item.moduleName}" var="item"
+							itemLabel="#{item.moduleName}" />
+						<p:ajax
+							listener="#{Group_managed_bean.getsubmoduleforselectedmodule()}"
+							update=":addGroupForm:panselect" />
+					</p:selectCheckboxMenu>
+
+					<h:outputLabel
+						rendered="#{Group_managed_bean.submoduleFraudConfiguration}"
+						for="submoduleFraudConfiguration"
+						value="Sous Module Fraud Configuration" />
+					<p:selectCheckboxMenu id="submoduleFraudConfiguration"
+						converter="omnifaces.SelectItemsConverter"
+						rendered="#{Group_managed_bean.submoduleFraudConfiguration}"
+						value="#{Group_managed_bean.listrepsubmoduleFraudConfigurationselected}"
+						multiple="true" filter="true" filterMatchMode="startsWith"
+						panelStyle="width:250px">
+						<f:selectItems itemValue="#{item}" var="item"
+							itemLabel="#{item.repSubModuleName}"
+							value="#{Group_managed_bean.listrepsubmoduleFraudConfiguration}" />
+					</p:selectCheckboxMenu>
+
+					<h:outputLabel
+						rendered="#{Group_managed_bean.submodulemoduleFraudDecition}"
+						for="submodulemoduleFraudDecition"
+						value="Sous Module Fraud Decisions" />
+					<p:selectCheckboxMenu id="submodulemoduleFraudDecition"
+						converter="omnifaces.SelectItemsConverter"
+						rendered="#{Group_managed_bean.submodulemoduleFraudDecition}"
+						value="#{Group_managed_bean.listrepsubmoduleFraudDecitionselected}"
+						multiple="true" filter="true" filterMatchMode="startsWith"
+						panelStyle="width:250px">
+						<f:selectItems itemValue="#{item}" var="item"
+							itemLabel="#{item.repSubModuleName}"
+							value="#{Group_managed_bean.listrepsubmoduleFraudDecition}" />
+					</p:selectCheckboxMenu>
+
+					<h:outputLabel
+						rendered="#{Group_managed_bean.submodulemoduleFraudWarning}"
+						for="submodulemoduleFraudWarning"
+						value="Sous Module Fraud Warning" />
+					<p:selectCheckboxMenu id="submodulemoduleFraudWarning"
+						converter="omnifaces.SelectItemsConverter"
+						rendered="#{Group_managed_bean.submodulemoduleFraudWarning}"
+						value="#{Group_managed_bean.listrepsubmoduleFraudWarningselected}"
+						multiple="true" filter="true" filterMatchMode="startsWith"
+						panelStyle="width:250px">
+						<f:selectItems itemValue="#{item}" var="item"
+							itemLabel="#{item.repSubModuleName}"
+							value="#{Group_managed_bean.listrepsubmoduleFraudWarning}" />
+					</p:selectCheckboxMenu>
+
+					<h:outputLabel
+						rendered="#{Group_managed_bean.submodulemoduleUsermanagement}"
+						for="submodulemoduleUsermanagement"
+						value="Sous Module User management" />
+					<p:selectCheckboxMenu id="submodulemoduleUsermanagement"
+						converter="omnifaces.SelectItemsConverter"
+						rendered="#{Group_managed_bean.submodulemoduleUsermanagement}"
+						value="#{Group_managed_bean.listrepsubmoduleUsermanagementselected}"
+						multiple="true" filter="true" filterMatchMode="startsWith"
+						panelStyle="width:250px">
+
+						<f:selectItems itemValue="#{item}" var="item"
+							itemLabel="#{item.repSubModuleName}"
+							value="#{Group_managed_bean.listrepsubmoduleUsermanagement}" />
+					</p:selectCheckboxMenu>
+
+
+				</p:panelGrid>
+
+				<p:separator />
+
+				<p:commandButton value="Submit" update="addGroupForm :groupsPanel" styleClass="btn btn-primary"
+					actionListener="#{Group_managed_bean.displaySelectedMultiple()}"
+					icon="ui-icon-check" oncomplete="PF('dlgAddGroup').hide()" />
+			</h:form>
+		</p:dialog>
+
+		<p:dialog id="editGroupDialog" widgetVar="dlgEditGroup">
+			<h:form id="editGroupForm">
+				<p:growl id="msgs" showDetail="true" escape="false" />
+				<p:panelGrid columns="2">
+					<h:outputLabel value="Group name" />
+					<p:inputText value="#{Group_managed_bean.selectedGroup.GName}" />
+
+					<h3>Checkbox</h3>
+					<p:tree value="#{Group_managed_bean.root}" var="doc"
+						propagateSelectionDown="false" selectionMode="checkbox"
+						selection="#{Group_managed_bean.selectedNodes}">
+						<p:treeNode icon="ui-icon-note">
+							<h:outputText value="#{doc.name}" />
+						</p:treeNode>
+						<p:treeNode>
+							<h:outputText value="#{doc.name}" />
+						</p:treeNode>
+						<p:treeNode>
+							<h:outputText value="#{doc.name}" />
+						</p:treeNode>
+						<p:treeNode>
+							<h:outputText value="#{doc.name}" />
+						</p:treeNode>
+					</p:tree>
+				</p:panelGrid>
+
+				<p:separator />
+
+				<p:commandButton value="Submit" update="editGroupForm :groupsPanel"
+					actionListener="#{Group_managed_bean.updateGroup(Group_managed_bean.selectedNodes)}"
+					icon="ui-icon-check" oncomplete="PF('dlgEditGroup').hide()" />
+			</h:form>
+		</p:dialog>
+
+
+	</ui:define>
+</ui:composition>

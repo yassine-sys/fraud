@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+<ui:composition>
+
+	<script type="text/javascript">
+function adjustPositionning(sourceElement, dialog) {
+	
+    var width = sourceElement.width();
+    var padding = 15;
+  dialog.parent().offset({ top: y, left: x + width + padding });
+}
+</script>
+	<p:dialog id="ProfileDlg" widgetVar="ProfileDialog" modal="true"
+		position="center center"
+		onShow="adjustPositionning($('#selectLocationButton'), $('#ProfileDlg'))"
+		appendTo="@(body)" resizable="false" draggable="false"
+		header="Profile">
+		<h:form id="ProfileForm">
+			<p:panelGrid columnClasses="column" columns="2">
+
+				<h:outputText value="Nom utilisateur :" />
+				<h:outputText value="#{loginbean.guser.nomUtilisateur}" />
+
+				<h:outputText value="Login Utilisateur :" />
+				<h:outputText value="#{loginbean.guser.ULogin}" />
+
+				<h:outputText value="Mail :" />
+				<h:outputText value="#{loginbean.guser.UMail}" />
+
+				<f:facet name="footer">
+					<div class="footer-right">
+						<p:commandButton styleClass="btn-info" value="Change Password"
+							action="#{loginbean.change_password()}" />
+						<p:commandButton styleClass="btn-danger" value="cancel"
+							onclick="PF('ProfileDialog').hide()" />
+					</div>
+				</f:facet>
+			</p:panelGrid>
+		</h:form>
+	</p:dialog>
+</ui:composition>
+
+</html>

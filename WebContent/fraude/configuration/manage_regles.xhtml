@@ -1,0 +1,790 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui" template="/template2/index.xhtml"
+	xmlns:hf="http://highfaces.org" xmlns:pe="http://primefaces.org/ui">
+	<ui:define name="pageTitle">Gestion Regles Fraude</ui:define>
+
+
+	<ui:define name="pagecontent">
+
+		<script>
+		$( "#fraud-conf-dd" ).addClass( "active" );
+		$( "#fraud-conf-dd #item3" ).addClass( "active" );
+		
+		</script>
+		<h:form id="form1">
+			<p:dataTable styleClass="myTable"
+				value="#{manage_fraude.liste_regle_fraude}" scrollable="true"
+				scrollHeight="150" var="regle" id="tblregle" rowKey="#{regle.id}"
+				selectionMode="single" selection="#{manage_fraude.selected_regle}">
+				<p:ajax event="rowSelect"
+					update=":form1:tblparam1,:form1:griddlgadd , form1:tablmail , form1:singleDT , form1:singleDT2"
+					listener="#{manage_fraude.loadparametres}" />
+				<p:column filterBy="#{regle.nom}" headerText="Nom du Regle"
+					width="200px;">
+					<h:outputText value="#{regle.nom}" />
+				</p:column>
+				<p:column headerText="Description">
+					<h:outputText value="#{regle.description}" />
+				</p:column>
+				<p:column headerText="Categorie"
+					filterBy="#{regle.categorie.nomCategorie}"
+					filterOptions="#{manage_fraude.categoriesFilterOptions}">
+					<h:outputText value="#{regle.categorie.nomCategorie}" />
+				</p:column>
+				<p:column headerText="Flux" filterBy="#{regle.flux.flowName}"
+					filterOptions="#{manage_fraude.fluxFilterOptions}">
+					<h:outputText value="#{regle.flux.flowName}" />
+				</p:column>
+
+				<p:column headerText="Etat" filterBy="#{regle.etat}"
+					filterOptions="#{manage_fraude.etatFilterOptions}">
+					<h:outputText value="Désactivé" rendered="#{regle.etat eq 'D'}" />
+					<h:outputText value="Activé" rendered="#{regle.etat eq 'A'}" />
+				</p:column>
+				<p:column headerText="Blocage" filterBy="#{regle.type}"
+					filterOptions="#{manage_fraude.typeBlocageFilterOptions}">
+					<h:outputText value="Automatique" rendered="#{regle.type eq '0'}" />
+					<h:outputText value="Manuel" rendered="#{regle.type eq '1'}" />
+				</p:column>
+				<p:column headerText="Utilisateur">
+					<h:outputText value="#{regle.nomUtilisateur}" />
+				</p:column>
+				<p:column headerText="Date Création">
+					<h:outputText value="#{regle.dateModif}" />
+				</p:column>
+				<f:facet name="footer">
+
+					<h:panelGrid columns="2">
+						<p:commandButton id="btn" process="tblregle"
+							icon="ui-icon-plusthick" value="Activer"
+							styleClass="btn btn-primary"
+							actionListener="#{manage_fraude.activerRegle()}"
+							update="tblregle" />
+						<p:commandButton id="btn1" process="tblregle"
+							icon="ui-icon-plusthick" value="Désactiver"
+							actionListener="#{manage_fraude.desactiverRegle()}"
+							styleClass="btn btn-primary" update="tblregle" />
+						<p:commandButton id="btn2" process="tblregle"
+							icon="ui-icon-plusthick" value="Blocage Automatique"
+							styleClass="btn btn-primary"
+							action="#{manage_fraude.blocageRegle()}" update="tblregle" />
+						<p:commandButton id="btn3" process="tblregle"
+							icon="ui-icon-plusthick" value="Blocage Manuel"
+							styleClass="btn btn-primary"
+							action="#{manage_fraude.nonblocageRegle()}" update="tblregle" />
+						<p:commandButton process="tblregle" value="Ajouter Regle"
+							styleClass="btn btn-primary"
+							action="#{manage_fraude.ajouterRegle}" />
+						<p:commandButton process="tblregle" icon="ui-icon-plusthick"
+							styleClass="btn btn-primary" value="Modifier Regle"
+							oncomplete="PF('dlgmodifregle').show();"
+							update=":form1:panregle1" />
+
+					</h:panelGrid>
+
+				</f:facet>
+
+
+			</p:dataTable>
+			<p:panelGrid columns="1">
+				<p:panelGrid columns="2" id="tblparam1">
+					<p:dataTable styleClass="myTable" id="tblparam" paginator="true"
+						rows="3" value="#{manage_fraude.listparamregle}" var="paramet"
+						rowKey="#{paramet.flow.flowName}" selectionMode="single"
+						selection="#{manage_fraude.selected_parametre}">
+						<p:column headerText="Paramètre">
+							<h:outputText value="#{paramet.flow.flowName}" />
+						</p:column>
+						<p:column headerText="Valeur Min">
+							<h:outputText value="#{paramet.vmin}" />
+						</p:column>
+						<p:column headerText="Valeur Max">
+							<h:outputText value="#{paramet.vmax}" />
+						</p:column>
+						<p:column headerText="Egale à">
+							<h:outputText value="#{paramet.vegal}" />
+						</p:column>
+						<f:facet name="footer">
+
+							<p:commandButton process="tblparam" icon="ui-icon-plusthick"
+								styleClass="btn btn-primary" value="Ajouter"
+								oncomplete="PF('dlgaddparam').show();" />
+							<p:commandButton process="tblparam" icon="ui-icon-plusthick"
+								style="color:#fff; background: rgb(28, 184, 65) ; border-color: #d73925 ;"
+								value="Modifier" oncomplete="PF('dlgmodifparam').show();" />
+
+							<p:commandButton value="Supprimer" styleClass="btn btn-danger"
+								actionListener="#{manage_fraude.deleteParam()}"
+								process="tblparam" update="tblparam">
+							</p:commandButton>
+
+						</f:facet>
+
+
+					</p:dataTable>
+
+					<p:dataTable styleClass="myTable" id="tblfiltres" paginator="true"
+						rows="3" value="#{manage_fraude.listfiltreregle}" var="fitregle"
+						rowKey="#{fitregle.id}" selectionMode="single"
+						selection="#{manage_fraude.selected_filtre}">
+
+						<p:column headerText="Filtre">
+							<h:outputText value="#{fitregle.filtreFraude.filtre}" />
+						</p:column>
+						<p:column headerText="Like ">
+							<h:outputText value="#{fitregle.vlike}" />
+						</p:column>
+						<p:column headerText="Not Like">
+							<h:outputText value="#{fitregle.vnotlike}" />
+						</p:column>
+						<p:column headerText="Egale à">
+							<h:outputText value="#{fitregle.vegal}" />
+						</p:column>
+						<p:column headerText="Different">
+							<h:outputText value="#{fitregle.vdef}" />
+						</p:column>
+						<p:column headerText="In Egale">
+							<h:outputText value="#{fitregle.inegal}" />
+
+
+
+
+
+						</p:column>
+						<p:column headerText="In Egale">
+							<p:commandButton process="@form" update=":form1:dtDetailsHotList"
+								rendered="#{fitregle.inegal!='-1' and (fitregle.filtreFraude.filtre =='Appelant' or fitregle.filtreFraude.filtre =='CellId' or fitregle.filtreFraude.filtre =='Imei' or fitregle.filtreFraude.filtre =='Appelee')}"
+								value="Show Hotlist" id="movieBtn" oncomplete="PF('pf').show();"
+								action="#{manage_fraude.getHotlistCellid()}">
+								<f:setPropertyActionListener value="#{fitregle}"
+									target="#{manage_fraude.fr}" />
+							</p:commandButton>
+
+						</p:column>
+						<f:facet name="footer">
+
+							<p:commandButton process="tblfiltres" icon="ui-icon-plusthick"
+								styleClass="btn btn-primary" value="Ajouter"
+								oncomplete="PF('dlgaddfiltre').show();" />
+							<p:commandButton process="tblfiltres" icon="ui-icon-plusthick"
+								style="color:#fff; background: rgb(28, 184, 65) ; border-color: #d73925 ;"
+								value="Modifier" oncomplete="PF('dlgmodiffiltre').show();"
+								actionListener="#{manage_fraude.selectChange1()}"
+								update=":form1:panfil1" />
+							<p:commandButton value="Supprimer" styleClass="btn btn-danger"
+								actionListener="#{manage_fraude.deleteFiltre}"
+								process="tblfiltres" update=":form1:tblfiltres">
+							</p:commandButton>
+						</f:facet>
+
+					</p:dataTable>
+
+				</p:panelGrid>
+
+
+
+
+
+				<p:panelGrid id="tablmail" columns="2">
+
+
+					<p:dataTable styleClass="myTable" var="dest" id="singleDT"
+						paginator="true" rows="6" value="#{manage_fraude.listregleMails}"
+						rowKey="#{dest.id}" selectionMode="single"
+						selection="#{manage_fraude.details_mail1}"
+						paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown} {Exporters}"
+						rowsPerPageTemplate="6,12,16">
+						<f:facet name="header">
+							<p:outputLabel value="Manage Régle"></p:outputLabel>
+						</f:facet>
+
+
+
+						<p:column>
+							<f:facet name="header">
+								<p:outputLabel value="Adress Mail" />
+							</f:facet>
+							<h:outputText value="#{dest.adresseMail}" />
+						</p:column>
+						<p:column>
+							<f:facet name="header">
+								<p:outputLabel value="Recap" />
+							</f:facet>
+							<h:outputText value="#{dest.type}" />
+						</p:column>
+
+
+						<p:column style="width:32px;text-align: center">
+							<p:commandButton process="singleDT" update="singleDT"
+								value="delete" icon="ui-icon-trash" title="Delete"
+								styleClass="btn btn-danger"
+								action="#{manage_fraude.deleteDetailMail()}">
+								<f:setPropertyActionListener value="#{dest}"
+									target="#{manage_fraude.details_mail1}" />
+								<p:confirm header="Confirmation" message="Are You Sure?"
+									icon="ui-icon-alert" />
+							</p:commandButton>
+
+							<p:confirmDialog global="true" showEffect="fade"
+								hideEffect="fade">
+								<p:commandButton value="Yes" type="button"
+									styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+								<p:commandButton value="No" type="button"
+									styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+							</p:confirmDialog>
+						</p:column>
+
+						<f:facet name="footer">
+							<h:panelGrid columns="2">
+
+								<p:commandButton process="singleDT" icon="ui-icon-plusthick"
+									styleClass="btn btn-primary" value="Add"
+									oncomplete="PF('dlgaddalert').show()" />
+
+							</h:panelGrid>
+						</f:facet>
+
+					</p:dataTable>
+
+
+
+
+
+
+					<p:dataTable styleClass="myTable" id="singleDT2"
+						value="#{manage_fraude.listregleSms}" paginator="true" rows="6"
+						var="Sms" rowKey="#{Sms.id}" selectionMode="single"
+						selection="#{manage_fraude.select_det_mail}"
+						paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown} {Exporters}"
+						rowsPerPageTemplate="6,12,16">
+
+
+						<f:facet name="header">
+							<p:outputLabel value="Manage Régle" />
+
+						</f:facet>
+
+						<p:column headerText="Msisdn">
+
+
+							<h:outputText value="#{Sms.msisdn}" />
+						</p:column>
+
+
+
+						<p:column headerText="Recap">
+							<h:outputText value="#{Sms.type}" />
+						</p:column>
+
+
+						<p:column style="width:32px;text-align: center">
+							<p:commandButton process="singleDT2" update="singleDT2"
+								value="delete" styleClass="btn btn-danger" icon="ui-icon-trash"
+								action="#{manage_fraude.deleteDetailSms()}">
+								<f:setPropertyActionListener value="#{Sms}"
+									target="#{manage_fraude.details_sms}" />
+								<p:confirm header="Confirmation" message="Are You Sure?"
+									icon="ui-icon-alert" />
+							</p:commandButton>
+
+							<p:confirmDialog global="true" showEffect="fade"
+								hideEffect="fade">
+								<p:commandButton value="Yes" type="button"
+									styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+								<p:commandButton value="No" type="button"
+									styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+							</p:confirmDialog>
+						</p:column>
+
+						<f:facet name="footer">
+
+							<p:commandButton process="singleDT2" icon="ui-icon-plusthick"
+								styleClass="btn btn-primary" value="Ajouter"
+								oncomplete="PF('dlgaddalert2').show();" />
+
+						</f:facet>
+
+					</p:dataTable>
+
+				</p:panelGrid>
+
+			</p:panelGrid>
+
+
+
+			<p:dialog header="Ajout" widgetVar="dlgaddalert" showEffect="explode"
+				id="panajouttaux" dynamic="true">
+				<p:messages id="Dlgaddmessages" showDetail="true" autoUpdate="true" />
+				<h:panelGrid>
+
+
+
+					<p:outputLabel value="Mail" />
+					<p:inputText value="#{manage_fraude.details_mail.adresseMail}"
+						required="true" requiredMessage="Entrer Votre Email"
+						validatorMessage="Format Invalide">
+
+						<f:validateRegex
+							pattern="^[_A-Za-z0-9-\+]+(\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9]+)*(\.[A-Za-z]{2,})$" />
+					</p:inputText>
+
+					<h:panelGrid columns="2" style="margin-bottom:10px" cellpadding="5">
+						<p:outputLabel for="city" value="Type d'envoi" />
+						<p:selectOneRadio id="city"
+							value="#{manage_fraude.details_mail.type}" layout="grid"
+							columns="3" converter="omnifaces.SelectItemsConverter">
+							<f:selectItem itemLabel="Recap" itemValue="Recap" />
+							<f:selectItem itemLabel="Instantane" itemValue="Instantane" />
+
+						</p:selectOneRadio>
+					</h:panelGrid>
+
+
+					<p:commandButton process="@form" value="Valider"
+						styleClass="btn btn-primary"
+						update=":form1:singleDT,:form1:panajouttaux"
+						action="#{manage_fraude.AjouterAlerteMail()}"
+						oncomplete="PF('dlgaddalert').hide()" />
+					<p:commandButton value="Annuler" onclick="PF('dlgaddalert').hide()"
+						styleClass="btn btn-danger" />
+				</h:panelGrid>
+
+
+			</p:dialog>
+
+
+
+
+
+
+
+
+
+
+			<p:dialog header="Ajout" widgetVar="dlgaddalert2"
+				showEffect="explode" id="panajouttaux2" dynamic="true">
+				<p:messages id="Dlgaddmessages2" showDetail="true" autoUpdate="true" />
+				<h:panelGrid>
+
+
+
+					<p:outputLabel value="Msisdn" />
+					<p:inputText value="#{manage_fraude.details_sms.msisdn}"
+						required="true">
+					</p:inputText>
+
+
+					<h:panelGrid columns="2" style="margin-bottom:10px" cellpadding="5">
+						<p:outputLabel value="Type d'envoi" />
+						<p:selectOneRadio value="#{manage_fraude.details_sms.type}"
+							layout="grid" columns="3"
+							converter="omnifaces.SelectItemsConverter">
+							<f:selectItem itemLabel="Recap" itemValue="Recap" />
+							<f:selectItem itemLabel="Instantane" itemValue="Instantane" />
+
+						</p:selectOneRadio>
+					</h:panelGrid>
+
+
+					<p:commandButton process="@form" value="Valider"
+						styleClass="btn btn-primary"
+						update=":form1:singleDT2,:form1:panajouttaux2"
+						action="#{manage_fraude.AjouterAlerteSms()}"
+						oncomplete="PF('dlgaddalert2').hide()" />
+					<p:commandButton value="Annuler" styleClass="btn btn-danger"
+						onclick="PF('panajouttaux2').hide()" />
+				</h:panelGrid>
+
+
+			</p:dialog>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+			<p:dialog widgetVar="dlgaddparam" dynamic="true">
+				<p:outputPanel id="panaddparam">
+					<p:panelGrid columns="2" id="griddlgadd">
+						<h:outputLabel value="Paramètre" />
+						<p:selectOneMenu id="param_menu"
+							value="#{manage_fraude.nouveauparametre.flow}"
+							converter="omnifaces.SelectItemsConverter">
+
+							<f:selectItem itemLabel="            " itemValue="" />
+							<f:selectItems value="#{manage_fraude.parametres}" var="cat"
+								itemLabel="#{cat.flowName}" itemValue="#{cat}" />
+
+						</p:selectOneMenu>
+					</p:panelGrid>
+					<p:panelGrid columns="3">
+						<h:outputLabel value="Valeurs" />
+						<p:selectOneMenu value="#{manage_fraude.choix_param_valeur}">
+
+							<f:selectItem itemLabel="Choisir..." itemValue="" />
+							<f:selectItem itemLabel="Egal à " itemValue="egale" />
+							<f:selectItem itemLabel="Supérieur à " itemValue="superieur" />
+							<f:selectItem itemLabel="Inferieur à " itemValue="inferieur" />
+						</p:selectOneMenu>
+						<p:spinner value="#{manage_fraude.param_valeur}"></p:spinner>
+						<p:commandButton process="panaddparam" value="Ajouter Parametre"
+							actionListener="#{manage_fraude.ajoutParam}"
+							styleClass="btn btn-primary" update=":form1:tblparam"
+							oncomplete="PF('dlgaddparam').hide();" />
+					</p:panelGrid>
+				</p:outputPanel>
+			</p:dialog>
+			<p:dialog widgetVar="dlgmodifparam" dynamic="true">
+
+				<p:outputPanel id="panmodifparam">
+					<p:panelGrid columns="3">
+						<h:outputLabel value="Valeurs" />
+						<p:selectOneMenu value="#{manage_fraude.choix_param_valeur}">
+
+							<f:selectItem itemLabel="Choisir..." itemValue="" />
+							<f:selectItem itemLabel="Egal à " itemValue="egale" />
+							<f:selectItem itemLabel="Supérieur à " itemValue="superieur" />
+							<f:selectItem itemLabel="Inferieur à " itemValue="inferieur" />
+						</p:selectOneMenu>
+						<p:spinner value="#{manage_fraude.param_valeur}"></p:spinner>
+					</p:panelGrid>
+					<p:commandButton process="panmodifparam" value="Modifier Parametre"
+						actionListener="#{manage_fraude.update_param}"
+						styleClass="btn btn-primary" update=":form1:tblparam"
+						oncomplete="PF('dlgmodifparam').hide();" />
+
+				</p:outputPanel>
+
+			</p:dialog>
+			<p:dialog widgetVar="dlgaddfiltre" dynamic="true">
+				<p:outputPanel id="panaddfiltre">
+					<p:panelGrid columns="2" id="griddlgaddfil">
+						<p:panelGrid columns="2">
+							<h:outputLabel value="Filtre" />
+							<p:selectOneMenu id="filter_menu"
+								value="#{manage_fraude.filtrefraude}">
+								<p:ajax listener="#{manage_fraude.selectChange}" process="@form"
+									event="change" update="panfil" />
+								<f:selectItem itemLabel="Choisir..." itemValue="" />
+								<f:selectItems value="#{manage_fraude.filtres}" var="cat"
+									itemLabel="#{cat.filtre}" itemValue="#{cat.filtre}" />
+
+							</p:selectOneMenu>
+						</p:panelGrid>
+						<p:panelGrid columns="3">
+							<h:outputLabel value="Valeurs" />
+							<p:selectOneMenu value="#{manage_fraude.choix_filtre_valeur}">
+								<p:ajax listener="#{manage_fraude.selectChange}" event="change"
+									update="panfil" />
+								<f:selectItem itemLabel="Choisir..." itemValue="" />
+								<f:selectItem itemLabel="Egal  " itemValue="egale" />
+								<f:selectItem itemLabel="Different " itemValue="different" />
+								<f:selectItem itemLabel="Like  " itemValue="like" />
+								<f:selectItem itemLabel="Not Like  " itemValue="not like" />
+								<f:selectItem itemLabel="IN " itemValue="in" />
+							</p:selectOneMenu>
+							<p:outputPanel id="panfil">
+
+								<p:selectOneMenu value="#{manage_fraude.filtre_valeur}"
+									rendered="#{manage_fraude.listTypeDest}">
+
+									<f:selectItem itemLabel="Choisir..." itemValue="" />
+									<f:selectItems value="#{manage_fraude.typeDests}" var="dest"
+										itemLabel="#{dest.typeDest}" itemValue="#{dest.id}" />
+
+								</p:selectOneMenu>
+								<p:selectOneMenu value="#{manage_fraude.filtre_valeur}"
+									rendered="#{manage_fraude.listin}">
+
+									<f:selectItem itemLabel="Choisir..." itemValue="" />
+									<f:selectItems value="#{manage_fraude.lstcellid}" var="dest"
+										itemLabel="#{dest.nom}" itemValue="#{dest.id}" />
+
+								</p:selectOneMenu>
+								<p:selectOneMenu value="#{manage_fraude.filtre_valeur}"
+									rendered="#{manage_fraude.listinappele}">
+
+									<f:selectItem itemLabel="Choisir..." itemValue="" />
+									<f:selectItems value="#{manage_fraude.lstappele}" var="dest"
+										itemLabel="#{dest.nom}" itemValue="#{dest.id}" />
+
+								</p:selectOneMenu>
+								<p:selectOneMenu value="#{manage_fraude.filtre_valeur}"
+									rendered="#{manage_fraude.listinimei}">
+
+									<f:selectItem itemLabel="Choisir..." itemValue="" />
+									<f:selectItems value="#{manage_fraude.lstimei}" var="dest"
+										itemLabel="#{dest.nom}" itemValue="#{dest.id}" />
+
+								</p:selectOneMenu>
+								<p:selectOneMenu value="#{manage_fraude.filtre_valeur}"
+									rendered="#{manage_fraude.listinoffre}">
+
+									<f:selectItem itemLabel="Choisir..." itemValue="" />
+									<f:selectItems value="#{manage_fraude.lst_offre}" var="dest"
+										itemLabel="#{dest.nomOffre}" itemValue="#{dest.idOffre}" />
+
+								</p:selectOneMenu>
+
+
+								<p:selectOneMenu value="#{manage_fraude.filtre_valeur}"
+									rendered="#{manage_fraude.listinappelant}">
+
+									<f:selectItem itemLabel="Choisir..." itemValue="" />
+									<f:selectItems value="#{manage_fraude.lstappelant}" var="dest"
+										itemLabel="#{dest.nom}" itemValue="#{dest.id}" />
+
+								</p:selectOneMenu>
+								<p:selectOneMenu value="#{manage_fraude.filtre_valeur}"
+									rendered="#{manage_fraude.listPlanTarifaire}">
+
+									<f:selectItem itemLabel="Choisir..." itemValue="" />
+									<f:selectItems value="#{fraude.plans}" var="plan"
+										itemLabel="#{plan.planTarifaire}"
+										itemValue="#{plan.codePlanTarifaire}" />
+
+								</p:selectOneMenu>
+								<p:selectOneMenu value="#{manage_fraude.filtre_valeur}"
+									rendered="#{manage_fraude.typelocroa}">
+
+									<f:selectItem itemLabel="Choisir..." itemValue=""
+										noSelectionOption="true" />
+									<f:selectItem itemLabel="Prépayé" itemValue="prp" />
+									<f:selectItem itemLabel="Roaming" itemValue="roa" />
+									<f:selectItem itemLabel="Postpayé" itemValue="pop" />
+									<f:selectItem itemLabel="Etranger" itemValue="etranger" />
+
+								</p:selectOneMenu>
+								<p:selectOneMenu value="#{manage_fraude.filtre_valeur}"
+									rendered="#{manage_fraude.typeAppel}">
+
+									<f:selectItem itemLabel="Choisir..." itemValue=""
+										noSelectionOption="true" />
+									<f:selectItem itemLabel="Local" itemValue="loc" />
+									<f:selectItem itemLabel="Roaming" itemValue="roa" />
+
+
+								</p:selectOneMenu>
+								<p:inputText id="tes" value="#{manage_fraude.filtre_valeur}"
+									rendered="#{manage_fraude.text}">
+								</p:inputText>
+
+
+							</p:outputPanel>
+						</p:panelGrid>
+						<p:commandButton value="Ajouter Filtre"
+							styleClass="btn btn-primary"
+							action="#{manage_fraude.ajouter_filtre}"
+							update=":form1:tblfiltres,:form1:panaddfiltre"
+							process=":form1:panaddfiltre"
+							oncomplete="PF('dlgaddfiltre').hide();" />
+
+						<p:commandButton value="Annuler" styleClass="btn btn-danger"
+							oncomplete="PF('dlgaddfiltre').hide();" />
+					</p:panelGrid>
+				</p:outputPanel>
+			</p:dialog>
+			<p:dialog widgetVar="dlgmodiffiltre">
+				<p:outputPanel id="panmodiffiltre">
+
+					<p:panelGrid columns="3">
+						<h:outputLabel value="Valeurs" />
+						<p:selectOneMenu value="#{manage_fraude.choix_filtre_valeur1}">
+							<p:ajax listener="#{manage_fraude.selectChange1}"
+								update="panfil1" />
+							<f:selectItem itemLabel="Choisir..." itemValue="" />
+							<f:selectItem itemLabel="Egal  " itemValue="egale" />
+							<f:selectItem itemLabel="Different " itemValue="different" />
+							<f:selectItem itemLabel="Like  " itemValue="like" />
+							<f:selectItem itemLabel="Not Like  " itemValue="not like" />
+							<f:selectItem itemLabel="IN  " itemValue="in" />
+						</p:selectOneMenu>
+						<p:outputPanel id="panfil1">
+
+							<p:selectOneMenu value="#{manage_fraude.filtre_valeur1}"
+								rendered="#{manage_fraude.listTypeDest}">
+
+								<f:selectItem itemLabel="Choisir..." itemValue="" />
+								<f:selectItems value="#{manage_fraude.typeDests}" var="dest"
+									itemLabel="#{dest.typeDest}" itemValue="#{dest.id}" />
+
+							</p:selectOneMenu>
+							<p:selectOneMenu value="#{manage_fraude.filtre_valeur1}"
+								rendered="#{manage_fraude.listin}">
+
+								<f:selectItem itemLabel="Choisir..." itemValue="" />
+								<f:selectItems value="#{manage_fraude.lstcellid}" var="dest"
+									itemLabel="#{dest.nom}" itemValue="#{dest.id}" />
+
+							</p:selectOneMenu>
+							<p:selectOneMenu value="#{manage_fraude.filtre_valeur1}"
+								rendered="#{manage_fraude.listinappele}">
+
+								<f:selectItem itemLabel="Choisir..." itemValue="" />
+								<f:selectItems value="#{manage_fraude.lstappele}" var="dest"
+									itemLabel="#{dest.nom}" itemValue="#{dest.id}" />
+
+							</p:selectOneMenu>
+							<p:selectOneMenu value="#{manage_fraude.filtre_valeur1}"
+								rendered="#{manage_fraude.listinimei}">
+
+								<f:selectItem itemLabel="Choisir..." itemValue="" />
+								<f:selectItems value="#{manage_fraude.lstimei}" var="dest"
+									itemLabel="#{dest.nom}" itemValue="#{dest.id}" />
+
+							</p:selectOneMenu>
+							<p:selectOneMenu value="#{manage_fraude.filtre_valeur1}"
+								rendered="#{manage_fraude.listinappelant}">
+
+								<f:selectItem itemLabel="Choisir..." itemValue="" />
+								<f:selectItems value="#{manage_fraude.lstappelant}" var="dest"
+									itemLabel="#{dest.nom}" itemValue="#{dest.id}" />
+
+							</p:selectOneMenu>
+							<p:selectOneMenu value="#{manage_fraude.filtre_valeur1}"
+								rendered="#{manage_fraude.listPlanTarifaire}">
+
+								<f:selectItem itemLabel="Choisir..." itemValue="" />
+								<f:selectItems value="#{fraude.plans}" var="plan"
+									itemLabel="#{plan.planTarifaire}"
+									itemValue="#{plan.codePlanTarifaire}" />
+
+							</p:selectOneMenu>
+							<p:selectOneMenu value="#{manage_fraude.filtre_valeur1}"
+								rendered="#{manage_fraude.typelocroa}">
+
+								<f:selectItem itemLabel="Choisir..." itemValue=""
+									noSelectionOption="true" />
+								<f:selectItem itemLabel="Prépayé" itemValue="prp" />
+								<f:selectItem itemLabel="Roaming" itemValue="roa" />
+								<f:selectItem itemLabel="Postpayé" itemValue="pop" />
+								<f:selectItem itemLabel="Etranger" itemValue="etranger" />
+
+							</p:selectOneMenu>
+							<p:selectOneMenu value="#{manage_fraude.filtre_valeur1}"
+								rendered="#{manage_fraude.typeAppel}">
+
+								<f:selectItem itemLabel="Choisir..." itemValue=""
+									noSelectionOption="true" />
+								<f:selectItem itemLabel="Local" itemValue="loc" />
+								<f:selectItem itemLabel="Roaming" itemValue="roa" />
+
+
+							</p:selectOneMenu>
+							<p:inputText id="tes1" value="#{manage_fraude.filtre_valeur1}"
+								rendered="#{manage_fraude.text}">
+							</p:inputText>
+
+
+						</p:outputPanel>
+					</p:panelGrid>
+
+					<p:commandButton value="Modifier Filtre"
+						styleClass="btn btn-primary"
+						actionListener="#{manage_fraude.update_filtre}"
+						update=":form1:tblfiltres" process="panmodiffiltre"
+						onsuccess="PF('dlgmodiffiltre').hide()" />
+
+				</p:outputPanel>
+
+			</p:dialog>
+			<p:dialog widgetVar="dlgmodifregle" dynamic="true">
+				<p:outputPanel id="panregle1">
+					<p:panelGrid columns="2">
+						<h:outputLabel value="Nom Regle" />
+						<p:inputText value="#{manage_fraude.selected_regle.nom}"></p:inputText>
+						<h:outputLabel
+							value="Categorie:(#{manage_fraude.selected_regle.categorie.nomCategorie} : actuel) " />
+						<p:selectOneMenu value="#{manage_fraude.selected_regle.categorie}"
+							converter="omnifaces.SelectItemsConverter">
+
+							<f:selectItem itemLabel="Choisir..." itemValue="" />
+							<f:selectItems value="#{manage_fraude.lstCategories}" var="cat"
+								itemLabel="#{cat.nomCategorie}" itemValue="#{cat}" />
+
+						</p:selectOneMenu>
+						<h:outputLabel value="Flux" />
+						<p:selectOneMenu value="#{manage_fraude.selected_regle.flux}"
+							converter="omnifaces.SelectItemsConverter">
+							<f:selectItem itemLabel="Choisir..." itemValue="" />
+							<f:selectItems value="#{manage_fraude.lstFlux}" var="flux"
+								itemLabel="#{flux.flowName}" itemValue="#{flux}" />
+
+						</p:selectOneMenu>
+						<p:commandButton process="panregle1" value="Modifier"
+							styleClass="btn btn-primary"
+							action="#{manage_fraude.updateRegle}" update=":form1:tblregle"
+							onstart="PF('blockUIWidget').block()"
+							oncomplete="PF('blockUIWidget').unblock(),PF('dlgmodifregle').hide();"></p:commandButton>
+						<p:commandButton value="Annuler" styleClass="btn btn-primary"
+							onclick="PF('dlgmodifregle').hide()"></p:commandButton>
+
+					</p:panelGrid>
+				</p:outputPanel>
+			</p:dialog>
+			<p:dialog id="moviePanel" widgetVar="pf" dynamic="true"
+				style="width:200px;">
+				<p:dataTable styleClass="myTable" id="dtDetailsHotList"
+					style="width:200px;" var="movies"
+					value="#{manage_fraude.listdetails}" rows="5" paginator="true">
+					<f:facet name="header">
+						<h:outputLabel value="#{manage_fraude.nameCellid}" />
+
+					</f:facet>
+					<p:column headerText="Hotlist">
+						<h:outputText value="#{movies[2]}" />
+					</p:column>
+
+
+
+
+				</p:dataTable>
+			</p:dialog>
+			<p:blockUI block=":form1" trigger=":form1:tblregle:btn">
+      Patientez<br />
+				<h:graphicImage value="/resources/img/ajaxloadingbar.gif" />
+			</p:blockUI>
+			<p:blockUI block=":form1" trigger=":form1:tblregle:btn1">
+      Patientez<br />
+				<h:graphicImage value="/resources/img/ajaxloadingbar.gif" />
+			</p:blockUI>
+			<p:blockUI block=":form1" trigger=":form1:tblregle:btn2">
+      Patientez<br />
+				<h:graphicImage value="/resources/img/ajaxloadingbar.gif" />
+			</p:blockUI>
+			<p:blockUI block=":form1" trigger=":form1:tblregle:btn3">
+      Patientez<br />
+				<h:graphicImage value="/resources/img/ajaxloadingbar.gif" />
+			</p:blockUI>
+			<pe:blockUI widgetVar="blockUIWidget">
+				<h:panelGrid columns="2">
+					<h:graphicImage library="img" name="ajaxloadingbar.gif"
+						style="margin-right: 12px; vertical-align: middle;" />
+					<h:outputText value="Please wait..." style="white-space: nowrap;" />
+				</h:panelGrid>
+			</pe:blockUI>
+		</h:form>
+	</ui:define>
+</ui:composition>

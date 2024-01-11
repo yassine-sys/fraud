@@ -1,0 +1,420 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui" template="/template2/index.xhtml"
+	xmlns:hf="http://highfaces.org"
+	xmlns:pe="http://primefaces.org/ui/extensions">
+
+	<ui:define name="pageTitle">welcome</ui:define>
+
+
+	<ui:define name="pagecontent">
+
+
+		<script>
+			$( "#fraud-decision-dd" ).addClass( "active" );
+			$( "#fraud-decision-dd #item5" ).addClass( "active" );
+		</script>
+		<h:form id="form1">
+			<!--  rendered="#{tabMenuNavigationBean.pan_fraude}"> -->
+			<p:layout style="min-height:800px;"
+				onToggle="$(window).trigger('resize');"
+				onResize="$(window).trigger('resize');">
+				<p:layoutUnit id="layeast" position="east" header="Menu"
+					collapsible="true" style="height:480px;overflow:hidden;" size="200">
+					<p:panel header="Export" rendered="#{stat_fraude.chartDisplayed}">
+						<h:commandLink>
+							<p:graphicImage library="img" name="excel.png" width="24" />
+							<pe:exporter type="xlsx" target="tbl3,tbl5,tbl4"
+								fileName="RapportActivation" datasetPadding="4" />
+						</h:commandLink>
+
+						<h:commandLink>
+							<p:graphicImage library="img" name="pdf.png" width="24" />
+							<pe:exporter type="pdf" target="tbl3,tbl5,tbl4"
+								fileName="RapportActivation" datasetPadding="4" />
+						</h:commandLink>
+					</p:panel>
+					<p:panel header="Period" styleClass="noupdate">
+						<p:panelGrid columns="1" id="PanelPeriode">
+							<p:selectOneMenu value="#{stat_fraude.choix_periode}">
+								<p:ajax listener="#{stat_fraude.handlechange}" event="change"
+									update="@form" process="@this" />
+								<f:selectItem itemLabel="" itemValue=" " />
+								<f:selectItem itemLabel="Per Day" itemValue="Par Jour" />
+								<f:selectItem itemLabel="Per Month" itemValue="Par Mois" />
+								<f:selectItem itemLabel="Per Year" itemValue="Par An" />
+							</p:selectOneMenu>
+						</p:panelGrid>
+					</p:panel>
+					<p:panel header="Category">
+						<p:panelGrid columns="1">
+							<p:selectOneMenu value="#{stat_fraude.category}"
+								converter="omnifaces.SelectItemsConverter">
+								<p:ajax listener="#{stat_fraude.handleCategoryChange}"
+									event="change" update="@(form:not(.noupdate))" process="@this" />
+								<f:selectItem itemLabel="" itemValue="" />
+								<f:selectItems value="#{stat_fraude.lst_CategoriesFraudes}"
+									var="type" itemLabel="#{type.nomCategorie}" itemValue="#{type}" />
+
+
+							</p:selectOneMenu>
+						</p:panelGrid>
+					</p:panel>
+					<p:panel header="Operator" rendered="#{stat_fraude.bypass}"
+						id="expPan">
+						<p:panelGrid columns="1">
+							<p:selectOneMenu value="#{stat_fraude.operateur}">
+								<p:ajax listener="#{stat_fraude.handlechange}" event="change"
+									update="layoutUnit" process="@this" />
+								<f:selectItem itemLabel="All" itemValue="Tous" />
+								<f:selectItem itemLabel="Orange Mali"
+									itemValue="'2237%' or msisdn like '22380%' or msisdn like '22381%' or msisdn like '22382%' or msisdn like '22383%' or msisdn like '22384%' or msisdn like '22384%' or msisdn like '22390%' or msisdn like '22391%' or msisdn like '22392%' or msisdn like '22393%' or msisdn like '22394%'" />
+								<f:selectItem itemLabel="ATEL" itemValue="'2235%'" />
+								<f:selectItem itemLabel="SOTELMA"
+									itemValue="'2236%' or msisdn like '22385%' or msisdn like '22386%' or msisdn like '22386%' or msisdn like '22387%' or msisdn like '22388%' or msisdn like '22389%' or msisdn like '22395%' or msisdn like '22396%' or msisdn like '22397%' or msisdn like '22398%' or msisdn like '22399%'" />
+							</p:selectOneMenu>
+						</p:panelGrid>
+					</p:panel>
+					<p:commandButton value="Execut" id="btn" ajax="true" update="@form"
+						onstart="PF('blockUIWidget').block()"
+						oncomplete="PF('blockUIWidget').unblock()"
+						actionListener="#{stat_fraude.Valider}"></p:commandButton>
+
+				</p:layoutUnit>
+				<p:layoutUnit styleClass="layoutUnitCenter" id="layoutUnit"
+					position="center">
+
+					<div class="ui-grid-row">
+
+						<p:panel header="" rendered="#{stat_fraude.chartDisplayed}">
+							<hf:chart type="line" subTitle="#{stat_fraude.subTitle}"
+								title="Rapport Stat Fraude ">
+								<hf:chartSerie name="Duration"
+									value="#{stat_fraude.staticListStatMsc}" var="point"
+									point="#{point[1]}" tickLabel="#{point[0]}"></hf:chartSerie>
+								<hf:chartSerie name="Count Of Call"
+									value="#{stat_fraude.staticListStatMsc}" var="point1"
+									point="#{point1[2]}" tickLabel="#{point1[0]}"></hf:chartSerie>
+								<hf:chartSerie name="Number Of MSISDN"
+									value="#{stat_fraude.staticListStatMsc}" var="point1"
+									point="#{point1[3]}" tickLabel="#{point1[0]}"></hf:chartSerie>
+
+								<hf:chartAxis position="w" min="0"></hf:chartAxis>
+							</hf:chart>
+							<f:facet name="options">
+								<p:menu>
+									<p:submenu label="Options">
+										<p:menuitem value="Export" url="#" icon="ui-icon-newwin"
+											onclick="PF('Details').show()" />
+
+									</p:submenu>
+								</p:menu>
+							</f:facet>
+						</p:panel>
+
+
+
+					</div>
+					<div class="ui-grid-row">
+
+						<div class="ui-grid-col-6">
+
+							<p:panel header="" rendered="#{stat_fraude.chartDisplayed}">
+								<hf:chart type="pie" title="Répartition par Category"
+									subTitle="#{stat_fraude.subTitle}">
+									<hf:chartSerie value="#{stat_fraude.lstByCategory}" var="point"
+										point="#{point[1]}" tickLabel="#{point[0]}"></hf:chartSerie>
+
+
+								</hf:chart>
+								<f:facet name="options">
+									<p:menu>
+										<p:submenu label="Options">
+											<p:menuitem value="Export" url="#" icon="ui-icon-newwin"
+												onclick="PF('DetailsCat').show()" />
+
+										</p:submenu>
+									</p:menu>
+								</f:facet>
+							</p:panel>
+						</div>
+
+
+						<div class="ui-grid-col-6">
+
+							<p:panel header="" rendered="#{stat_fraude.chartDisplayed}">
+								<hf:chart type="pie" title="Répartition par Location"
+									subTitle="#{stat_fraude.subTitle}">
+									<hf:chartSerie value="#{stat_fraude.lstByLocation}" var="point"
+										point="#{point[1]}" tickLabel="#{point[0]}"></hf:chartSerie>
+
+
+								</hf:chart>
+								<f:facet name="options">
+									<p:menu>
+										<p:submenu label="Options">
+											<p:menuitem value="Export" url="#" icon="ui-icon-newwin"
+												onclick="PF('DetailsLoc').show()" />
+
+										</p:submenu>
+									</p:menu>
+								</f:facet>
+							</p:panel>
+						</div>
+					</div>
+					<div class="ui-grid-row">
+
+
+
+						<p:panel header=""
+							rendered="#{stat_fraude.chartDisplayed and stat_fraude.bypass}">
+							<hf:chart type="pie"
+								title="Répartition Nombre MSISDN par Operateur"
+								subTitle="#{stat_fraude.subTitle}">
+								<hf:chartSerie value="#{stat_fraude.lstByOperateur}" var="point"
+									point="#{point[1]}" tickLabel="#{point[0]}"></hf:chartSerie>
+
+
+							</hf:chart>
+							<f:facet name="options">
+								<p:menu>
+									<p:submenu label="Options">
+										<p:menuitem value="Export" url="#" icon="ui-icon-newwin"
+											onclick="PF('DetailsPlan').show()" />
+
+									</p:submenu>
+								</p:menu>
+							</f:facet>
+						</p:panel>
+					</div>
+					<div class="ui-grid-row">
+
+						<p:panel header=" Rapport Stat Fraude" rendered="#{stat_fraude.chartDisplayed}">
+							<p:dataTable style="width:100%" var="point"
+								value="#{stat_fraude.staticListStatMscTAB}" paginator="true"
+								paginatorPosition="top" rows="7"
+								paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+								rowsPerPageTemplate="5,7,15" id="carTable">
+
+								<p:column>
+									<f:facet name="header">
+										<h:outputText value="msisdn" />
+									</f:facet>
+									<h:outputText value="#{point[0]}">
+									</h:outputText>
+								</p:column>
+								<p:column>
+									<f:facet name="header">
+										<h:outputText value="Duration" />
+									</f:facet>
+									<h:outputText value="#{point[1]}">
+									</h:outputText>
+								</p:column>
+								<p:column>
+									<f:facet name="header">
+										<h:outputText value="Count Of Call" />
+									</f:facet>
+									<h:outputText value="#{point[2]}">
+									</h:outputText>
+								</p:column>
+							</p:dataTable>
+						</p:panel>
+					</div>
+				</p:layoutUnit>
+				<pe:blockUI widgetVar="blockUIWidget">
+					<h:panelGrid columns="2">
+						<h:graphicImage library="img" name="ajaxloadingbar.gif"
+							style="margin-right: 12px; vertical-align: middle;" />
+						<h:outputText value="Please wait..." style="white-space: nowrap;" />
+					</h:panelGrid>
+				</pe:blockUI>
+			</p:layout>
+
+			<p:dialog resizable="true" header="Report Stat Of Fraud By Location"
+				modal="true" appendTo="@(body)" widgetVar="DetailsLoc"
+				width="1043px">
+				<p:outputPanel id="DetailParLocation"
+					rendered="#{stat_fraude.chartDisplayed}">
+					<p:dataTable value="#{stat_fraude.lstByLocation}" var="det"
+						paginator="true" rows="8"
+						paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown} {Exporters}"
+						rowsPerPageTemplate="6,12,16" id="tbl1">
+						<f:facet name="header">
+							<h:outputText value=" Breakdown By MSISDN Number Rental" />
+						</f:facet>
+						<f:facet name="{Exporters}">
+							<h:commandLink>
+								<p:graphicImage library="img" name="excel.png" width="24" />
+								<pe:exporter type="xlsx" target="tbl1" fileName="FraudeByOP" />
+							</h:commandLink>
+
+							<h:commandLink>
+								<p:graphicImage library="img" name="pdf.png" width="24" />
+								<pe:exporter type="pdf" target="tbl1" fileName="FraudeByOP" />
+							</h:commandLink>
+
+						</f:facet>
+						<p:column>
+							<f:facet name="header">
+								<h:outputText value="Location" />
+							</f:facet>
+							<h:outputText value="#{det[0]}" />
+						</p:column>
+						<p:column>
+							<f:facet name="header">
+								<h:outputText value="Number MSISDN" />
+							</f:facet>
+							<h:outputText value="#{det[1]}">
+								<f:convertNumber pattern="#,##0" maxFractionDigits="2" />
+							</h:outputText>
+						</p:column>
+					</p:dataTable>
+				</p:outputPanel>
+			</p:dialog>
+			<p:dialog resizable="true" header="Rapport Stat Fraude Par Categorie"
+				modal="true" appendTo="@(body)" widgetVar="DetailsCat"
+				width="1043px">
+				<p:outputPanel id="DetailParCategory"
+					rendered="#{stat_fraude.chartDisplayed}">
+					<p:dataTable value="#{stat_fraude.lstByCategory}" var="det"
+						paginator="true" rows="8"
+						paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown} {Exporters}"
+						rowsPerPageTemplate="6,12,16" id="tbl2">
+						<f:facet name="header">
+							<h:outputText value=" Répartition Nombre MSISDN par Categorie" />
+						</f:facet>
+						<f:facet name="{Exporters}">
+							<h:commandLink>
+								<p:graphicImage library="img" name="excel.png" width="24" />
+								<pe:exporter type="xlsx" target="tbl2" fileName="FraudeByOP" />
+							</h:commandLink>
+
+							<h:commandLink>
+								<p:graphicImage library="img" name="pdf.png" width="24" />
+								<pe:exporter type="pdf" target="tbl2" fileName="FraudeByOP" />
+							</h:commandLink>
+
+						</f:facet>
+						<p:column>
+							<f:facet name="header">
+								<h:outputText value="Category" />
+							</f:facet>
+							<h:outputText value="#{det[0]}" />
+						</p:column>
+						<p:column>
+							<f:facet name="header">
+								<h:outputText value="Number MSISDN" />
+							</f:facet>
+							<h:outputText value="#{det[1]}">
+								<f:convertNumber pattern="#,##0" maxFractionDigits="2" />
+							</h:outputText>
+						</p:column>
+					</p:dataTable>
+				</p:outputPanel>
+			</p:dialog>
+
+			<p:dialog resizable="true" header="Rapport Stat Fraude Par Operateur"
+				modal="true" appendTo="@(body)" widgetVar="DetailsPlan"
+				width="1043px">
+				<p:outputPanel id="DetailParAnomalie"
+					rendered="#{stat_fraude.chartDisplayed}">
+					<p:dataTable value="#{stat_fraude.lstByOperateur}" var="det"
+						paginator="true" rows="8"
+						paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown} {Exporters}"
+						rowsPerPageTemplate="6,12,16" id="tbl3">
+						<f:facet name="header">
+							<h:outputText value=" Number MSISDN Distribution by Operator" />
+						</f:facet>
+						<f:facet name="{Exporters}">
+							<h:commandLink>
+								<p:graphicImage library="img" name="excel.png" width="24" />
+								<pe:exporter type="xlsx" target="tbl3" fileName="FraudeByOP" />
+							</h:commandLink>
+
+							<h:commandLink>
+								<p:graphicImage library="img" name="pdf.png" width="24" />
+								<pe:exporter type="pdf" target="tbl3" fileName="FraudeByOP" />
+							</h:commandLink>
+
+						</f:facet>
+						<p:column>
+							<f:facet name="header">
+								<h:outputText value="Operator" />
+							</f:facet>
+							<h:outputText value="#{det[0]}" />
+						</p:column>
+						<p:column>
+							<f:facet name="header">
+								<h:outputText value="Number Msisdn" />
+							</f:facet>
+							<h:outputText value="#{det[1]}">
+								<f:convertNumber pattern="#,##0" maxFractionDigits="2" />
+							</h:outputText>
+						</p:column>
+					</p:dataTable>
+				</p:outputPanel>
+			</p:dialog>
+			<p:dialog resizable="true" header="Rapport Stat Fraud " modal="true"
+				appendTo="@(body)" widgetVar="Details" width="1043px">
+				<p:outputPanel id="DetailsFraude"
+					rendered="#{stat_fraude.chartDisplayed}">
+					<p:dataTable value="#{stat_fraude.staticListStatMsc}" var="det"
+						paginator="true" rows="8"
+						paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown} {Exporters}"
+						rowsPerPageTemplate="6,12,16" id="tbl4">
+						<f:facet name="header">
+							<h:outputText value=" Stat Fraude #{stat_fraude.subTitle}" />
+						</f:facet>
+						<f:facet name="{Exporters}">
+							<h:commandLink>
+								<p:graphicImage library="img" name="excel.png" width="24" />
+								<pe:exporter type="xlsx" target="tbl4" fileName="FraudeByOP" />
+							</h:commandLink>
+
+							<h:commandLink>
+								<p:graphicImage library="img" name="pdf.png" width="24" />
+								<pe:exporter type="pdf" target="tbl4" fileName="FraudeByOP" />
+							</h:commandLink>
+
+						</f:facet>
+						<p:column>
+							<f:facet name="header">
+								<h:outputText value="Date" />
+							</f:facet>
+							<h:outputText value="#{det[0]}" />
+						</p:column>
+						<p:column>
+							<f:facet name="header">
+								<h:outputText value="Nb Msisdn" />
+							</f:facet>
+							<h:outputText value="#{det[3]}">
+								<f:convertNumber pattern="#,##0" maxFractionDigits="2" />
+							</h:outputText>
+						</p:column>
+						<p:column>
+							<f:facet name="header">
+								<h:outputText value="Duree" />
+							</f:facet>
+							<h:outputText value="#{det[1]}">
+								<f:convertNumber pattern="#,##0" maxFractionDigits="2" />
+							</h:outputText>
+						</p:column>
+						<p:column>
+							<f:facet name="header">
+								<h:outputText value="Nb Appel" />
+							</f:facet>
+							<h:outputText value="#{det[2]}">
+								<f:convertNumber pattern="#,##0" maxFractionDigits="2" />
+							</h:outputText>
+						</p:column>
+					</p:dataTable>
+				</p:outputPanel>
+			</p:dialog>
+
+		</h:form>
+
+
+	</ui:define>
+</ui:composition>
